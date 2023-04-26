@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 import {
@@ -19,12 +19,22 @@ import {
 import { languages } from "@codemirror/language-data";
 import { vim } from "@replit/codemirror-vim";
 
+import hljs from "highlight.js";
+import "highlight.js/styles/github-dark-dimmed.css";
+
 function App() {
   const [markText, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
   const { colorMode, toggleColorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
   const [showPreview, setShowPreview] = useState(false);
+
+  useEffect(() => {
+    hljs.configure({
+      cssSelector: "code",
+    });
+    hljs.highlightAll();
+  }, [html]);
 
   const handleMarkdownChange = async (
     value: string | undefined,
@@ -47,22 +57,23 @@ function App() {
       className="markdown-body"
       bg={bgColor}
       height="full"
-      flex={1}
       fontSize="md"
       minH="100vh"
       textAlign="left"
+      w="100%"
       p={4}
       overflow="auto"
     >
       <VStack spacing={4} mb={6}>
         <HStack
-          w={"100%"}
           mx="auto"
           spacing={6}
           height="100%"
           justifyContent="space-evenly"
+          alignItems="flex-start"
+          w="100%"
         >
-          <Box w="full">
+          <Box w="50%">
             <CodeMirror
               value={markText}
               onChange={handleMarkdownChange}
@@ -80,7 +91,7 @@ function App() {
             />
           </Box>
           <Box
-            w="full"
+            w="50%"
             borderRadius="md"
             borderColor={useColorModeValue("gray.300", "gray.600")}
             borderWidth="1px"
