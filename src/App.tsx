@@ -5,17 +5,21 @@ import {
   Box,
   HStack,
   IconButton,
-  Textarea,
   VStack,
   useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { FiEye, FiEyeOff, FiMoon, FiSun } from "react-icons/fi";
 import "github-markdown-css/github-markdown-dark.css";
-import MonacoEditor from "@monaco-editor/react";
+import CodeMirror from "@uiw/react-codemirror";
+import {
+  markdown,
+  markdownLanguage,
+} from "@codemirror/lang-markdown";
+import { languages } from "@codemirror/language-data";
 
 function App() {
-  const [markdown, setMarkdown] = useState("");
+  const [markText, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
   const { colorMode, toggleColorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
@@ -50,26 +54,31 @@ function App() {
       overflow="auto"
     >
       <VStack spacing={4} mb={6}>
-        <HStack w={"100%"} mx="auto" spacing={6} height="100%">
-          <MonacoEditor
-            // height="100%"
-            height="100vh"
-            width="100%"
-            language="markdown"
-            theme="vs-dark"
-            options={{
-              lineNumbers: "off",
-              minimap: { enabled: false },
-              wordWrap: "on",
-              wrappingIndent: "indent",
-              scrollBeyondLastLine: false,
-              fontSize: 16,
-            }}
-            value={markdown}
-            onChange={handleMarkdownChange}
-          />
+        <HStack
+          w={"100%"}
+          mx="auto"
+          spacing={6}
+          height="100%"
+          justifyContent="space-evenly"
+        >
+          <Box w="full">
+            <CodeMirror
+              value={markText}
+              onChange={handleMarkdownChange}
+              theme="dark"
+              basicSetup={{
+                lineNumbers: false,
+              }}
+              extensions={[
+                markdown({
+                  base: markdownLanguage,
+                  codeLanguages: languages,
+                }),
+              ]}
+            />
+          </Box>
           <Box
-            w="100%"
+            w="full"
             borderRadius="md"
             borderColor={useColorModeValue("gray.300", "gray.600")}
             borderWidth="1px"
