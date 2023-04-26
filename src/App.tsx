@@ -17,6 +17,7 @@ import {
   markdownLanguage,
 } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
+import { vim } from "@replit/codemirror-vim";
 
 function App() {
   const [markText, setMarkdown] = useState("");
@@ -70,6 +71,7 @@ function App() {
                 lineNumbers: false,
               }}
               extensions={[
+                vim(),
                 markdown({
                   base: markdownLanguage,
                   codeLanguages: languages,
