@@ -1,52 +1,96 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
+import {
+  Box,
+  HStack,
+  IconButton,
+  Textarea,
+  VStack,
+  useColorMode,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { FiEye, FiEyeOff, FiMoon, FiSun } from "react-icons/fi";
+import "github-markdown-css/github-markdown-dark.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [markdown, setMarkdown] = useState("");
+  const [html, setHTML] = useState("");
+  const { colorMode, toggleColorMode } = useColorMode();
+  const bgColor = { light: "gray.50", dark: "gray.900" };
+  const [showPreview, setShowPreview] = useState(false);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  const handleMarkdownChange = async (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const value = event.target.value;
+    setMarkdown(value);
+
+    try {
+      const html = await invoke<string>("parse_markdown", {
+        markdown: value,
+      });
+      setHTML(html);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
-    <div className="container">
-      <h1>Welcome to Tauri!</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <div className="row">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            greet();
-          }}
-        >
-          <input
-            id="greet-input"
-            onChange={(e) => setName(e.currentTarget.value)}
-            placeholder="Enter a name..."
+    <Box
+      className="markdown-body"
+      bg={bgColor}
+      height="full"
+      textAlign="left"
+      p={4}
+      overflow="auto"
+    >
+      <VStack spacing={4} mb={6}>
+        <HStack w={"100%"} mx="auto" spacing={6}>
+          <Textarea
+            placeholder="Write your markdown here"
+            value={markdown}
+            onChange={handleMarkdownChange}
+            minHeight="300px"
+            borderRadius="md"
+            borderColor={useColorModeValue("gray.300", "gray.600")}
+            _hover={{
+              borderColor: useColorModeValue("gray.400", "gray.500"),
+            }}
+            _focus={{
+              borderColor: useColorModeValue("blue.400", "blue.600"),
+            }}
           />
-          <button type="submit">Greet</button>
-        </form>
-      </div>
-      <p>{greetMsg}</p>
-    </div>
+          <Box
+            w="100%"
+            borderRadius="md"
+            borderColor={useColorModeValue("gray.300", "gray.600")}
+            borderWidth="1px"
+            p={4}
+            bg={bgColor}
+          >
+            <div dangerouslySetInnerHTML={{ __html: html }} />
+          </Box>
+        </HStack>
+        <Box w="100%" textAlign="right">
+          <IconButton
+            icon={showPreview ? <FiEyeOff /> : <FiEye />}
+            onClick={() => setShowPreview(!showPreview)}
+            aria-label="Toggle preview"
+            variant="ghost"
+            size="md"
+            mr={4}
+          />
+          <IconButton
+            icon={colorMode === "light" ? <FiMoon /> : <FiSun />}
+            onClick={toggleColorMode}
+            aria-label="Toggle dark mode"
+            variant="ghost"
+            size="md"
+          />
+        </Box>
+      </VStack>
+    </Box>
   );
 }
 
