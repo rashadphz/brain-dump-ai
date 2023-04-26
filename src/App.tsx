@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { FiEye, FiEyeOff, FiMoon, FiSun } from "react-icons/fi";
 import "github-markdown-css/github-markdown-dark.css";
+import MonacoEditor from "@monaco-editor/react";
 
 function App() {
   const [markdown, setMarkdown] = useState("");
@@ -21,10 +22,10 @@ function App() {
   const [showPreview, setShowPreview] = useState(false);
 
   const handleMarkdownChange = async (
-    event: React.ChangeEvent<HTMLTextAreaElement>
+    value: string | undefined,
+    event: any
   ) => {
-    const value = event.target.value;
-    setMarkdown(value);
+    setMarkdown(value || "");
 
     try {
       const html = await invoke<string>("parse_markdown", {
@@ -41,25 +42,31 @@ function App() {
       className="markdown-body"
       bg={bgColor}
       height="full"
+      flex={1}
+      fontSize="md"
+      minH="100vh"
       textAlign="left"
       p={4}
       overflow="auto"
     >
       <VStack spacing={4} mb={6}>
-        <HStack w={"100%"} mx="auto" spacing={6}>
-          <Textarea
-            placeholder="Write your markdown here"
+        <HStack w={"100%"} mx="auto" spacing={6} height="100%">
+          <MonacoEditor
+            // height="100%"
+            height="100vh"
+            width="100%"
+            language="markdown"
+            theme="vs-dark"
+            options={{
+              lineNumbers: "off",
+              minimap: { enabled: false },
+              wordWrap: "on",
+              wrappingIndent: "indent",
+              scrollBeyondLastLine: false,
+              fontSize: 16,
+            }}
             value={markdown}
             onChange={handleMarkdownChange}
-            minHeight="300px"
-            borderRadius="md"
-            borderColor={useColorModeValue("gray.300", "gray.600")}
-            _hover={{
-              borderColor: useColorModeValue("gray.400", "gray.500"),
-            }}
-            _focus={{
-              borderColor: useColorModeValue("blue.400", "blue.600"),
-            }}
           />
           <Box
             w="100%"

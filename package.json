@@ -13,12 +13,14 @@
     "@chakra-ui/react": "^2.6.0",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@monaco-editor/react": "^4.5.0",
     "@tauri-apps/api": "^1.2.0",
     "framer-motion": "^6",
     "github-markdown-css": "^5.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-icons": "^4.8.0"
+    "react-icons": "^4.8.0",
+    "react-monaco-editor": "^0.52.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.2.3",
