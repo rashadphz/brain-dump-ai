@@ -12,6 +12,7 @@ import {
   useClipboard,
   HStack,
   Button,
+  Spinner,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FiCheck, FiClipboard, FiCopy } from "react-icons/fi";
@@ -30,6 +31,8 @@ const HelperSidebar = () => {
   const [completionType, setCompletionType] = useState<
     "word" | "sentence" | "multi-line"
   >("word");
+  const [waitingForCompletion, setWaitingForCompletion] =
+    useState<boolean>(false);
 
   const handleSwitch = () => {
     setIsOn(!isOn);
@@ -53,11 +56,14 @@ const HelperSidebar = () => {
   }, [tabIndex]);
 
   const completeText = async () => {
+    setWaitingForCompletion(true);
+
     const { result } = await Completions.getCompletion(
       "I am an avid user of Ruby on Rails. I ",
       completionType
     );
     setCompletionText(result);
+    setWaitingForCompletion(false);
   };
 
   return (
@@ -89,26 +95,42 @@ const HelperSidebar = () => {
         >
           Make a suggestion
         </Button>
-        <HStack
-          py={3}
-          px={3}
-          align="center"
-          justify="space-between"
-          w="full"
-          background="gray.800"
-          rounded="lg"
-        >
-          <Text fontSize="md" fontWeight="medium" mr={2}>
-            {completionText}
-          </Text>
-          <IconButton
-            aria-label="Copy"
-            icon={
-              hasCopied ? <Icon as={FiCheck} /> : <Icon as={FiCopy} />
-            }
-            onClick={onCopy}
-          />
-        </HStack>
+        {waitingForCompletion ? (
+          <Box
+            py={3}
+            px={3}
+            w="full"
+            background="gray.800"
+            textAlign="center"
+          >
+            <Spinner />
+          </Box>
+        ) : (
+          <HStack
+            py={3}
+            px={3}
+            align="center"
+            justify="space-between"
+            w="full"
+            background="gray.800"
+            rounded="lg"
+          >
+            <Text fontSize="md" fontWeight="medium" mr={2}>
+              {completionText}
+            </Text>
+            <IconButton
+              aria-label="Copy"
+              icon={
+                hasCopied ? (
+                  <Icon as={FiCheck} />
+                ) : (
+                  <Icon as={FiCopy} />
+                )
+              }
+              onClick={onCopy}
+            />
+          </HStack>
+        )}
         <Button
           leftIcon={<FiClipboard />}
           w="full"
