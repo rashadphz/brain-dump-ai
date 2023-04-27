@@ -21,6 +21,38 @@ import { vim } from "@replit/codemirror-vim";
 
 import hljs from "highlight.js";
 import "highlight.js/styles/github-dark-dimmed.css";
+import { EditorView } from "codemirror";
+import { githubDark } from "@uiw/codemirror-theme-github";
+import HelperSidebar from "./components/HelperSidebar";
+
+type ViewMode = "markdown" | "preview" | "split";
+
+type EditorProps = {
+  markText: string;
+  setMarkdown: (value: string) => void;
+};
+
+const Editor = ({ markText, setMarkdown }: EditorProps) => {
+  return (
+    <CodeMirror
+      value={markText}
+      onChange={setMarkdown}
+      theme={githubDark}
+      basicSetup={{
+        lineNumbers: false,
+        foldGutter: false,
+      }}
+      extensions={[
+        vim(),
+        markdown({
+          base: markdownLanguage,
+          codeLanguages: languages,
+        }),
+        EditorView.lineWrapping,
+      ]}
+    />
+  );
+};
 
 function App() {
   const [markText, setMarkdown] = useState("");
@@ -28,6 +60,7 @@ function App() {
   const { colorMode, toggleColorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
   const [showPreview, setShowPreview] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("split");
 
   useEffect(() => {
     hljs.configure({
@@ -52,6 +85,10 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    handleMarkdownChange(markText, null);
+  }, [markText]);
+
   return (
     <Box
       className="markdown-body"
@@ -74,32 +111,12 @@ function App() {
           w="100%"
         >
           <Box w="50%">
-            <CodeMirror
-              value={markText}
-              onChange={handleMarkdownChange}
-              theme="dark"
-              basicSetup={{
-                lineNumbers: false,
-              }}
-              extensions={[
-                vim(),
-                markdown({
-                  base: markdownLanguage,
-                  codeLanguages: languages,
-                }),
-              ]}
-            />
+            <Editor markText={markText} setMarkdown={setMarkdown} />
           </Box>
-          <Box
-            w="50%"
-            borderRadius="md"
-            borderColor={useColorModeValue("gray.300", "gray.600")}
-            borderWidth="1px"
-            p={4}
-            bg={bgColor}
-          >
+          <HelperSidebar />
+          {/* <Box w="50%" p={4} bg={bgColor}>
             <div dangerouslySetInnerHTML={{ __html: html }} />
-          </Box>
+          </Box> */}
         </HStack>
         <Box w="100%" textAlign="right">
           <IconButton
