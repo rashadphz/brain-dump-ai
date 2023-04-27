@@ -18,7 +18,13 @@ import { useEffect, useState } from "react";
 import { FiCheck, FiClipboard, FiCopy } from "react-icons/fi";
 import { Completions } from "../api";
 
-const HelperSidebar = () => {
+const HelperSidebar = ({
+  markText,
+  setMarkdown,
+}: {
+  markText: string;
+  setMarkdown: (value: string) => void;
+}) => {
   const [isOn, setIsOn] = useState(false);
   const {
     onCopy,
@@ -59,11 +65,15 @@ const HelperSidebar = () => {
     setWaitingForCompletion(true);
 
     const { result } = await Completions.getCompletion(
-      "I am an avid user of Ruby on Rails. I ",
+      markText,
       completionType
     );
     setCompletionText(result);
     setWaitingForCompletion(false);
+  };
+
+  const appendTextToDocument = (text: string) => {
+    setMarkdown(markText + text);
   };
 
   return (
@@ -132,12 +142,13 @@ const HelperSidebar = () => {
           </HStack>
         )}
         <Button
+          onClick={() => appendTextToDocument(completionText)}
           leftIcon={<FiClipboard />}
           w="full"
           mt={6}
           background="gray.900"
         >
-          Add text to end of document
+          Add text to document
         </Button>
       </VStack>
     </Box>

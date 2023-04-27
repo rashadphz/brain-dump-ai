@@ -113,10 +113,13 @@ function App() {
           <Box w="50%">
             <Editor markText={markText} setMarkdown={setMarkdown} />
           </Box>
-          <HelperSidebar />
           {/* <Box w="50%" p={4} bg={bgColor}>
             <div dangerouslySetInnerHTML={{ __html: html }} />
           </Box> */}
+          <HelperSidebar
+            markText={markText}
+            setMarkdown={setMarkdown}
+          />
         </HStack>
         <Box w="100%" textAlign="right">
           <IconButton
