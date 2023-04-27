@@ -13,7 +13,7 @@ import {
   HStack,
   Button,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiCheck, FiClipboard, FiCopy } from "react-icons/fi";
 import { Completions } from "../api";
 
@@ -26,14 +26,36 @@ const HelperSidebar = () => {
     hasCopied,
   } = useClipboard("This is the inital value");
 
+  const [tabIndex, setTabIndex] = useState(0);
+  const [completionType, setCompletionType] = useState<
+    "word" | "sentence" | "multi-line"
+  >("word");
+
   const handleSwitch = () => {
     setIsOn(!isOn);
   };
 
+  useEffect(() => {
+    switch (tabIndex) {
+      case 0:
+        setCompletionType("word");
+        break;
+      case 1:
+        setCompletionType("sentence");
+        break;
+      case 2:
+        setCompletionType("multi-line");
+        break;
+      default:
+        setCompletionType("word");
+        break;
+    }
+  }, [tabIndex]);
+
   const completeText = async () => {
     const { result } = await Completions.getCompletion(
-      "I am an avid user of Ruby ",
-      "sentence"
+      "I am an avid user of Ruby on Rails. I ",
+      completionType
     );
     setCompletionText(result);
   };
@@ -48,7 +70,11 @@ const HelperSidebar = () => {
         <Heading size="lg" pt="4">
           Completion Size
         </Heading>
-        <Tabs variant="solid-rounded" colorScheme="red">
+        <Tabs
+          onChange={(index) => setTabIndex(index)}
+          variant="solid-rounded"
+          colorScheme="red"
+        >
           <TabList>
             <Tab>Word</Tab>
             <Tab>Sentence</Tab>
