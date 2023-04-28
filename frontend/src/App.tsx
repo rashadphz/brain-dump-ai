@@ -45,6 +45,7 @@ type EditorProps = {
 };
 import { Prec } from "@codemirror/state";
 import React from "react";
+import { Note, NotesService } from "./db/dbservice";
 
 const EditorTheme = Prec.highest(
   EditorView.theme({
@@ -106,6 +107,15 @@ function App() {
   const bgColor = { light: "gray.50", dark: "gray.900" };
   const [showPreview, setShowPreview] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("split");
+
+  const notesService = new NotesService();
+  const [notes, setNotes] = useState<Note[]>([]);
+
+  useEffect(() => {
+    notesService.getAll().then((notes) => {
+      setNotes(notes);
+    });
+  }, []);
 
   useEffect(() => {
     hljs.configure({
@@ -175,7 +185,7 @@ function App() {
           background="gray.900"
           height="100vh"
         >
-          <NotesSidebar />
+          <NotesSidebar notes={notes} />
         </Box>
         <Box w="70%" px={2} marginRight="2rem">
           <Tabs isLazy>

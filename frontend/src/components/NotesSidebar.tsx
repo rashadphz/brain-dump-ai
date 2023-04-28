@@ -2,14 +2,15 @@ import {
   Text,
   Badge,
   Box,
-  Flex,
   Heading,
   VStack,
   ChakraProvider,
-  Stack,
+  HStack,
 } from "@chakra-ui/react";
+import { Note } from "../db/dbservice";
 
-const NotePreview = () => {
+const NotePreview = ({ note }: { note: Note }) => {
+  const { title, content, tags } = note;
   return (
     <ChakraProvider resetCSS>
       <Box
@@ -22,19 +23,32 @@ const NotePreview = () => {
       >
         <VStack spacing={2} align="start">
           <Heading as="h4" size="sm">
-            Untitled
+            {title}
           </Heading>
           <VStack align="start" spacing={0}>
-            <Text fontSize="sm" color="blue.300">
-              a few seconds
-            </Text>
+            <HStack spacing={2}>
+              <Text fontSize="sm" color="blue.300">
+                a few seconds
+              </Text>
+              {tags.map((tag) => (
+                <Badge
+                  borderRadius="full"
+                  px="2"
+                  colorScheme="blue"
+                  fontSize="0.8em"
+                  textTransform="none"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </HStack>
             <Text
               fontWeight="medium"
               noOfLines={1}
               fontSize="sm"
               color="gray.400"
             >
-              My name is Rashad and I am a student
+              {content}
             </Text>
           </VStack>
         </VStack>
@@ -43,15 +57,13 @@ const NotePreview = () => {
   );
 };
 
-const NotesSidebar = () => {
+const NotesSidebar = ({ notes }: { notes: Note[] }) => {
   return (
     <Box height="100%">
       <Box mx="auto" height="100%" alignItems="flex-start">
-        <NotePreview />
-        <NotePreview />
-        <NotePreview />
-        <NotePreview />
-        <NotePreview />
+        {notes.map((note) => {
+          return <NotePreview note={note} />;
+        })}
       </Box>
     </Box>
   );
