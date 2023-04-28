@@ -42,7 +42,9 @@
         "resizable": true,
         "title": "brain-dump",
         "width": 1200,
-        "height": 800
+        "height": 1000,
+        "hiddenTitle": true,
+        "titleBarStyle": "Overlay"
       }
     ]
   }
