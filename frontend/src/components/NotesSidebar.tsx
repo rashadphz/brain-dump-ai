@@ -9,8 +9,15 @@ import {
 } from "@chakra-ui/react";
 import { Note } from "../db/dbservice";
 
-const NotePreview = ({ note }: { note: Note }) => {
+const NotePreview = ({
+  note,
+  isSelected,
+}: {
+  note: Note;
+  isSelected: boolean;
+}) => {
   const { title, content, tags } = note;
+  console.log(isSelected);
   return (
     <ChakraProvider resetCSS>
       <Box
@@ -19,7 +26,7 @@ const NotePreview = ({ note }: { note: Note }) => {
         borderBottomWidth="1px"
         px={4}
         py={3}
-        backgroundColor="gray.900"
+        backgroundColor={isSelected ? "blue.900" : "gray.900"}
       >
         <VStack spacing={2} align="start">
           <Heading as="h4" size="sm">
@@ -57,12 +64,25 @@ const NotePreview = ({ note }: { note: Note }) => {
   );
 };
 
-const NotesSidebar = ({ notes }: { notes: Note[] }) => {
+const NotesSidebar = ({
+  notes,
+  selectedNote,
+  setSelectedNote,
+}: {
+  notes: Note[];
+  selectedNote: Note | null;
+  setSelectedNote: (note: Note) => void;
+}) => {
   return (
     <Box height="100%">
       <Box mx="auto" height="100%" alignItems="flex-start">
         {notes.map((note) => {
-          return <NotePreview note={note} />;
+          const isSelected = note._id === selectedNote?._id;
+          return (
+            <Box onClick={() => setSelectedNote(note)}>
+              <NotePreview isSelected={isSelected} note={note} />
+            </Box>
+          );
         })}
       </Box>
     </Box>

@@ -109,13 +109,22 @@ function App() {
   const [viewMode, setViewMode] = useState<ViewMode>("split");
 
   const notesService = new NotesService();
+
   const [notes, setNotes] = useState<Note[]>([]);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
   useEffect(() => {
     notesService.getAll().then((notes) => {
       setNotes(notes);
+      setSelectedNote(notes[0]);
     });
   }, []);
+
+  useEffect(() => {
+    if (selectedNote) {
+      setMarkdown(selectedNote.content);
+    }
+  }, [selectedNote]);
 
   useEffect(() => {
     hljs.configure({
@@ -185,7 +194,11 @@ function App() {
           background="gray.900"
           height="100vh"
         >
-          <NotesSidebar notes={notes} />
+          <NotesSidebar
+            notes={notes}
+            selectedNote={selectedNote}
+            setSelectedNote={setSelectedNote}
+          />
         </Box>
         <Box w="70%" px={2} marginRight="2rem">
           <Tabs isLazy>
