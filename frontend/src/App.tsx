@@ -1,15 +1,26 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
+import "./titlebar.css";
 import {
   Box,
+  Button,
+  Flex,
   HStack,
   IconButton,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   VStack,
   useColorMode,
   useColorModeValue,
+  useMultiStyleConfig,
+  useTab,
 } from "@chakra-ui/react";
 import { FiEye, FiEyeOff, FiMoon, FiSun } from "react-icons/fi";
+import { FaMarkdown } from "react-icons/fa";
 import "github-markdown-css/github-markdown-dark.css";
 import CodeMirror from "@uiw/react-codemirror";
 import {
@@ -24,6 +35,7 @@ import "highlight.js/styles/github-dark-dimmed.css";
 import { EditorView } from "codemirror";
 import { githubDark } from "@uiw/codemirror-theme-github";
 import HelperSidebar from "./components/HelperSidebar";
+import NotesSidebar from "./components/NotesSidebar";
 
 type ViewMode = "markdown" | "preview" | "split";
 
@@ -31,6 +43,38 @@ type EditorProps = {
   markText: string;
   setMarkdown: (value: string) => void;
 };
+import { Prec } from "@codemirror/state";
+import React from "react";
+
+const EditorTheme = Prec.highest(
+  EditorView.theme({
+    "&": {
+      fontSize: "14pt",
+    },
+    ".cm-content": {
+      fontFamily: "Avenir Next, system-ui, sans-serif",
+      minHeight: "200px",
+    },
+    ".cm-gutters": {
+      minHeight: "200px",
+    },
+    ".cm-scroller": {
+      overflow: "auto",
+      maxHeight: "600px",
+    },
+    ".cm-fat-cursor": {
+      position: "absolute",
+      background: "#AEAFAD",
+      border: "none",
+      whiteSpace: "pre",
+    },
+    "&:not(.cm-focused) .cm-fat-cursor": {
+      background: "none",
+      outline: "solid 1px #AEAFAD",
+      color: "transparent !important",
+    },
+  })
+);
 
 const Editor = ({ markText, setMarkdown }: EditorProps) => {
   return (
@@ -41,14 +85,16 @@ const Editor = ({ markText, setMarkdown }: EditorProps) => {
       basicSetup={{
         lineNumbers: false,
         foldGutter: false,
+        highlightActiveLine: false,
       }}
       extensions={[
-        vim(),
+        EditorTheme,
         markdown({
           base: markdownLanguage,
           codeLanguages: languages,
         }),
         EditorView.lineWrapping,
+        vim(),
       ]}
     />
   );
@@ -57,7 +103,6 @@ const Editor = ({ markText, setMarkdown }: EditorProps) => {
 function App() {
   const [markText, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
-  const { colorMode, toggleColorMode } = useColorMode();
   const bgColor = { light: "gray.50", dark: "gray.900" };
   const [showPreview, setShowPreview] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("split");
@@ -89,56 +134,78 @@ function App() {
     handleMarkdownChange(markText, null);
   }, [markText]);
 
+  const CustomTab = React.forwardRef(
+    (props: any, ref: React.Ref<any>) => {
+      const tabProps = useTab({ ...props, ref });
+      const styles = useMultiStyleConfig("Tabs", tabProps);
+      const index = props.index;
+      const isSelected = !!tabProps["aria-selected"];
+
+      return (
+        <Button
+          leftIcon={index == 0 ? <FaMarkdown /> : <FiEye />}
+          __css={styles.tab}
+          borderRadius="0"
+          border={0}
+          borderBottom={isSelected ? "2px solid" : "none"}
+          {...tabProps}
+        >
+          {tabProps.children}
+        </Button>
+      );
+    }
+  );
+
   return (
     <Box
-      className="markdown-body"
       bg={bgColor}
       height="full"
       fontSize="md"
       minH="100vh"
       textAlign="left"
       w="100%"
-      p={4}
+      pt={10}
       overflow="auto"
     >
-      <VStack spacing={4} mb={6}>
-        <HStack
-          mx="auto"
-          spacing={6}
-          height="100%"
-          justifyContent="space-evenly"
-          alignItems="flex-start"
-          w="100%"
+      <Flex mx="auto" height="100%" alignItems="flex-start">
+        <Box
+          w="30%"
+          borderRight="1px solid"
+          borderColor="gray.700"
+          background="gray.900"
+          height="100vh"
         >
-          <Box w="50%">
-            <Editor markText={markText} setMarkdown={setMarkdown} />
-          </Box>
-          {/* <Box w="50%" p={4} bg={bgColor}>
-            <div dangerouslySetInnerHTML={{ __html: html }} />
-          </Box> */}
+          <NotesSidebar />
+        </Box>
+        <Box w="70%" px={2} marginRight="2rem">
+          <Tabs isLazy>
+            <TabList>
+              <CustomTab index={0}>Write</CustomTab>
+              <CustomTab index={1}>Preview</CustomTab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <Editor
+                  markText={markText}
+                  setMarkdown={setMarkdown}
+                />
+              </TabPanel>
+              <TabPanel>
+                <div
+                  className="markdown-body"
+                  dangerouslySetInnerHTML={{ __html: html }}
+                />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </Box>
+        {/* <Box w="30%">
           <HelperSidebar
             markText={markText}
             setMarkdown={setMarkdown}
           />
-        </HStack>
-        <Box w="100%" textAlign="right">
-          <IconButton
-            icon={showPreview ? <FiEyeOff /> : <FiEye />}
-            onClick={() => setShowPreview(!showPreview)}
-            aria-label="Toggle preview"
-            variant="ghost"
-            size="md"
-            mr={4}
-          />
-          <IconButton
-            icon={colorMode === "light" ? <FiMoon /> : <FiSun />}
-            onClick={toggleColorMode}
-            aria-label="Toggle dark mode"
-            variant="ghost"
-            size="md"
-          />
-        </Box>
-      </VStack>
+        </Box> */}
+      </Flex>
     </Box>
   );
 }

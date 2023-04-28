@@ -77,7 +77,7 @@ const HelperSidebar = ({
   };
 
   return (
-    <Box w="full" h="full" borderLeft="1px" px="5">
+    <Box>
       <VStack align="flex-start" w="full">
         <Heading size="lg">Auto Prediction</Heading>
         <Switch isChecked={isOn} onChange={handleSwitch}>
