@@ -79,17 +79,18 @@ const HelperSidebar = ({
   return (
     <Box>
       <VStack align="flex-start" w="full">
-        <Heading size="lg">Auto Prediction</Heading>
+        <Heading size="md">Auto Prediction</Heading>
         <Switch isChecked={isOn} onChange={handleSwitch}>
           Enable/Disabled
         </Switch>
-        <Heading size="lg" pt="4">
+        <Heading size="md" pt="4">
           Completion Size
         </Heading>
         <Tabs
           onChange={(index) => setTabIndex(index)}
           variant="solid-rounded"
-          colorScheme="red"
+          colorScheme="blue"
+          size="sm"
         >
           <TabList>
             <Tab>Word</Tab>

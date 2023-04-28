@@ -184,6 +184,7 @@ function App() {
       textAlign="left"
       w="100%"
       pt={10}
+      pr={5}
       overflow="auto"
     >
       <Flex mx="auto" height="100%" alignItems="flex-start">
@@ -222,12 +223,18 @@ function App() {
             </TabPanels>
           </Tabs>
         </Box>
-        {/* <Box w="30%">
+        <Box
+          w="30%"
+          borderLeft="1px solid"
+          borderColor="gray.700"
+          height="100vh"
+          pl={4}
+        >
           <HelperSidebar
             markText={markText}
             setMarkdown={setMarkdown}
           />
-        </Box> */}
+        </Box>
       </Flex>
     </Box>
   );
