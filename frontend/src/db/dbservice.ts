@@ -35,6 +35,16 @@ export class NotesService {
     }
   }
 
+  async update(id: string, content: string): Promise<Note> {
+    let newNote = this.db.get<Note>(id).then((doc) => {
+      doc.content = content;
+      this.db.put(doc);
+      return doc;
+    });
+    return newNote;
+
+  }
+
   async save(note: Note): Promise<Note> {
     const doc = {
       ...note,

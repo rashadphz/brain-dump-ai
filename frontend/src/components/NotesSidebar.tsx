@@ -17,7 +17,6 @@ const NotePreview = ({
   isSelected: boolean;
 }) => {
   const { title, content, tags } = note;
-  console.log(isSelected);
   return (
     <ChakraProvider resetCSS>
       <Box
@@ -37,7 +36,7 @@ const NotePreview = ({
               <Text fontSize="sm" color="blue.300">
                 a few seconds
               </Text>
-              {tags.map((tag) => (
+              {tags && tags.map((tag) => (
                 <Badge
                   borderRadius="full"
                   px="2"

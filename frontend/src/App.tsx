@@ -22,13 +22,6 @@ import {
 import { FiEye, FiEyeOff, FiMoon, FiSun } from "react-icons/fi";
 import { FaMarkdown } from "react-icons/fa";
 import "github-markdown-css/github-markdown-dark.css";
-import CodeMirror from "@uiw/react-codemirror";
-import {
-  markdown,
-  markdownLanguage,
-} from "@codemirror/lang-markdown";
-import { languages } from "@codemirror/language-data";
-import { vim } from "@replit/codemirror-vim";
 
 import hljs from "highlight.js";
 import "highlight.js/styles/github-dark-dimmed.css";
@@ -46,59 +39,14 @@ type EditorProps = {
 import { Prec } from "@codemirror/state";
 import React from "react";
 import { Note, NotesService } from "./db/dbservice";
+import Editor from "./components/Editor";
 
-const EditorTheme = Prec.highest(
-  EditorView.theme({
-    "&": {
-      fontSize: "14pt",
-    },
-    ".cm-content": {
-      fontFamily: "Avenir Next, system-ui, sans-serif",
-      minHeight: "200px",
-    },
-    ".cm-gutters": {
-      minHeight: "200px",
-    },
-    ".cm-scroller": {
-      overflow: "auto",
-      maxHeight: "600px",
-    },
-    ".cm-fat-cursor": {
-      position: "absolute",
-      background: "#AEAFAD",
-      border: "none",
-      whiteSpace: "pre",
-    },
-    "&:not(.cm-focused) .cm-fat-cursor": {
-      background: "none",
-      outline: "solid 1px #AEAFAD",
-      color: "transparent !important",
-    },
-  })
-);
-
-const Editor = ({ markText, setMarkdown }: EditorProps) => {
-  return (
-    <CodeMirror
-      value={markText}
-      onChange={setMarkdown}
-      theme={githubDark}
-      basicSetup={{
-        lineNumbers: false,
-        foldGutter: false,
-        highlightActiveLine: false,
-      }}
-      extensions={[
-        EditorTheme,
-        markdown({
-          base: markdownLanguage,
-          codeLanguages: languages,
-        }),
-        EditorView.lineWrapping,
-        vim(),
-      ]}
-    />
-  );
+const debounce = (func: any, wait: number) => {
+  let timeout: any;
+  return function executedFunction(...args: any) {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
 };
 
 function App() {
@@ -112,6 +60,13 @@ function App() {
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+
+  const saveNoteToDB = debounce((note: Note) => {
+    if (!note._id) {
+      return;
+    }
+    notesService.update(note._id, note.content);
+  }, 5000);
 
   useEffect(() => {
     notesService.getAll().then((notes) => {
@@ -151,6 +106,12 @@ function App() {
 
   useEffect(() => {
     handleMarkdownChange(markText, null);
+    if (selectedNote) {
+      saveNoteToDB({
+        ...selectedNote,
+        content: markText,
+      });
+    }
   }, [markText]);
 
   const CustomTab = React.forwardRef(
@@ -223,7 +184,7 @@ function App() {
             </TabPanels>
           </Tabs>
         </Box>
-        <Box
+        {/* <Box
           w="30%"
           borderLeft="1px solid"
           borderColor="gray.700"
@@ -234,7 +195,7 @@ function App() {
             markText={markText}
             setMarkdown={setMarkdown}
           />
-        </Box>
+        </Box> */}
       </Flex>
     </Box>
   );

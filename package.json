@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@uiw/codemirror-theme-vscode": "^4.19.16"
+  }
+}
