@@ -58,6 +58,17 @@ function App() {
   const prevSelectedNote = usePrevious(selectedNote);
 
   useEffect(() => {
+    const changes = NoteService.subscribe((notes) => {
+      setNotes(notes);
+      setSelectedNote(notes[0]);
+    });
+
+    return () => {
+      changes.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
     NoteService.getAllNotes().then((notes) => {
       setNotes(notes);
       setSelectedNote(notes[0]);

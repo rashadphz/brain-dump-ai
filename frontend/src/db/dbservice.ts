@@ -33,13 +33,23 @@ const NoteService = {
       updatedAt: new Date(),
     };
 
-    console.log("created note");
-    console.log("doc", doc);
-
     await db.put(doc);
     return doc;
   },
 
+  subscribe: (onChange: (notes: Note[]) => void) => {
+    const changes = db.changes({
+      since: "now",
+      live: true,
+      include_docs: true,
+    });
+    changes.on("change", async (change) => {
+      const notes = await NoteService.getAllNotes();
+      onChange(notes);
+    });
+
+    return changes;
+  },
 };
 
 export default NoteService;
