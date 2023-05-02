@@ -23,10 +23,6 @@ import { FiEye, FiEyeOff, FiMoon, FiSun } from "react-icons/fi";
 import { FaMarkdown } from "react-icons/fa";
 import "github-markdown-css/github-markdown-dark.css";
 
-import hljs from "highlight.js";
-import "highlight.js/styles/github-dark-dimmed.css";
-import { EditorView } from "codemirror";
-import { githubDark } from "@uiw/codemirror-theme-github";
 import HelperSidebar from "./components/HelperSidebar";
 import NotesSidebar from "./components/NotesSidebar";
 
@@ -40,6 +36,8 @@ import { Prec } from "@codemirror/state";
 import React from "react";
 import { Note, NotesService } from "./db/dbservice";
 import Editor from "./components/Editor";
+import Previewer from "./components/Previewer";
+import usePrevious from "./hooks/usePrevious";
 
 const debounce = (func: any, wait: number) => {
   let timeout: any;
@@ -60,6 +58,7 @@ function App() {
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const prevSelectedNote = usePrevious(selectedNote);
 
   const saveNoteToDB = debounce((note: Note) => {
     if (!note._id) {
@@ -76,17 +75,16 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (selectedNote) {
-      setMarkdown(selectedNote.content);
+    if (!selectedNote) return;
+
+    setMarkdown(selectedNote.content);
+    if (prevSelectedNote) {
+      saveNoteToDB({
+        ...prevSelectedNote,
+        content: markText,
+      });
     }
   }, [selectedNote]);
-
-  useEffect(() => {
-    hljs.configure({
-      cssSelector: "code",
-    });
-    hljs.highlightAll();
-  }, [html]);
 
   const handleMarkdownChange = async (
     value: string | undefined,
@@ -176,10 +174,7 @@ function App() {
                 />
               </TabPanel>
               <TabPanel>
-                <div
-                  className="markdown-body"
-                  dangerouslySetInnerHTML={{ __html: html }}
-                />
+                <Previewer html={html} />
               </TabPanel>
             </TabPanels>
           </Tabs>
