@@ -9,59 +9,37 @@ export interface Note {
   updatedAt?: Date;
 }
 
-export class NotesService {
-  private db: PouchDB.Database;
+const db = new PouchDB("notes");
 
-  constructor() {
-    this.db = new PouchDB("notes");
-  }
-
-  async getAll(): Promise<Note[]> {
-    const { rows } = await this.db.allDocs<Note>({
+const NoteService = {
+  getAllNotes: async (): Promise<Note[]> => {
+    const { rows } = await db.allDocs<Note>({
       include_docs: true,
     });
     return rows.map(({ doc }) => doc) as Note[];
-  }
+  },
 
-  async getById(id: string): Promise<Note | null> {
-    try {
-      const doc = await this.db.get<Note>(id);
-      return doc;
-    } catch (error) {
-      if (error === "not_found") {
-        return null;
-      }
-      throw error;
-    }
-  }
+  createNote: async (): Promise<Note> => {
+    const note = {
+      title: "",
+      content: "",
+      tags: [],
+    };
 
-  async update(id: string, content: string): Promise<Note> {
-    let newNote = this.db.get<Note>(id).then((doc) => {
-      doc.content = content;
-      this.db.put(doc);
-      return doc;
-    });
-    return newNote;
-
-  }
-
-  async save(note: Note): Promise<Note> {
     const doc = {
       ...note,
+      _id: new Date().toISOString(),
+      createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    if (!doc._id) {
-      doc._id = new Date().toISOString();
-      doc.createdAt = new Date();
-    }
+    console.log("created note");
+    console.log("doc", doc);
 
-    await this.db.put(doc);
+    await db.put(doc);
     return doc;
-  }
+  },
 
-  async delete(id: string): Promise<void> {
-    const doc = await this.db.get(id);
-    await this.db.remove(doc);
-  }
-}
+};
+
+export default NoteService;

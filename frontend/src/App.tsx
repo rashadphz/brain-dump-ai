@@ -34,7 +34,7 @@ type EditorProps = {
 };
 import { Prec } from "@codemirror/state";
 import React from "react";
-import { Note, NotesService } from "./db/dbservice";
+import NoteService, { Note } from "./db/dbservice";
 import Editor from "./components/Editor";
 import Previewer from "./components/Previewer";
 import usePrevious from "./hooks/usePrevious";
@@ -50,25 +50,15 @@ const debounce = (func: any, wait: number) => {
 function App() {
   const [markText, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
-  const bgColor = { light: "gray.50", dark: "gray.900" };
   const [showPreview, setShowPreview] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("split");
-
-  const notesService = new NotesService();
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const prevSelectedNote = usePrevious(selectedNote);
 
-  const saveNoteToDB = debounce((note: Note) => {
-    if (!note._id) {
-      return;
-    }
-    notesService.update(note._id, note.content);
-  }, 5000);
-
   useEffect(() => {
-    notesService.getAll().then((notes) => {
+    NoteService.getAllNotes().then((notes) => {
       setNotes(notes);
       setSelectedNote(notes[0]);
     });
@@ -78,12 +68,6 @@ function App() {
     if (!selectedNote) return;
 
     setMarkdown(selectedNote.content);
-    if (prevSelectedNote) {
-      saveNoteToDB({
-        ...prevSelectedNote,
-        content: markText,
-      });
-    }
   }, [selectedNote]);
 
   const handleMarkdownChange = async (
@@ -104,12 +88,6 @@ function App() {
 
   useEffect(() => {
     handleMarkdownChange(markText, null);
-    if (selectedNote) {
-      saveNoteToDB({
-        ...selectedNote,
-        content: markText,
-      });
-    }
   }, [markText]);
 
   const CustomTab = React.forwardRef(
@@ -136,7 +114,7 @@ function App() {
 
   return (
     <Box
-      bg={bgColor}
+      bg="gray.900"
       height="full"
       fontSize="md"
       minH="100vh"
