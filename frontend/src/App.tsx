@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 import "./titlebar.css";
@@ -32,18 +32,17 @@ type EditorProps = {
   markText: string;
   setMarkdown: (value: string) => void;
 };
-import { Prec } from "@codemirror/state";
 import React from "react";
 import NoteService, { Note } from "./db/dbservice";
 import Editor from "./components/Editor";
 import Previewer from "./components/Previewer";
 import usePrevious from "./hooks/usePrevious";
 
-const debounce = (func: any, wait: number) => {
-  let timeout: any;
-  return function executedFunction(...args: any) {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
+const debounce = (fn: Function, ms = 300) => {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return function (this: any, ...args: any[]) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn.apply(this, args), ms);
   };
 };
 
@@ -56,6 +55,14 @@ function App() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const prevSelectedNote = usePrevious(selectedNote);
+
+  const saveNote = useCallback(
+    debounce((modifiedNote: Note) => {
+      if (!modifiedNote._id) return;
+      NoteService.updateNoteById(modifiedNote._id, modifiedNote);
+    }, 1000),
+    []
+  );
 
   useEffect(() => {
     const changes = NoteService.subscribe((notes) => {
@@ -76,20 +83,19 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!selectedNote) return;
-
-    setMarkdown(selectedNote.content);
+    if (prevSelectedNote && prevSelectedNote._id) {
+      saveNote({
+        ...prevSelectedNote,
+        content: markText,
+      });
+    }
+    setMarkdown(selectedNote?.content || "");
   }, [selectedNote]);
 
-  const handleMarkdownChange = async (
-    value: string | undefined,
-    event: any
-  ) => {
-    setMarkdown(value || "");
-
+  const updateHTML = async (markdown: string) => {
     try {
       const html = await invoke<string>("parse_markdown", {
-        markdown: value,
+        markdown,
       });
       setHTML(html);
     } catch (e) {
@@ -97,9 +103,14 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    handleMarkdownChange(markText, null);
-  }, [markText]);
+  const handleEditorTextChange = (value: string) => {
+    saveNote({
+      ...selectedNote,
+      content: value,
+    });
+    updateHTML(value);
+    setMarkdown(value);
+  };
 
   const CustomTab = React.forwardRef(
     (props: any, ref: React.Ref<any>) => {
@@ -146,7 +157,7 @@ function App() {
           <NotesSidebar
             notes={notes}
             selectedNote={selectedNote}
-            setSelectedNote={setSelectedNote}
+            onSelectNote={setSelectedNote}
           />
         </Box>
         <Box w="70%" px={2} marginRight="2rem">
@@ -159,7 +170,7 @@ function App() {
               <TabPanel>
                 <Editor
                   markText={markText}
-                  setMarkdown={setMarkdown}
+                  onTextChange={handleEditorTextChange}
                 />
               </TabPanel>
               <TabPanel>

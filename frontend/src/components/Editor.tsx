@@ -13,7 +13,7 @@ import { githubDark } from "@uiw/codemirror-theme-github";
 
 type EditorProps = {
   markText: string;
-  setMarkdown: (value: string) => void;
+  onTextChange: (value: string) => void;
 };
 import { Prec } from "@codemirror/state";
 
@@ -47,11 +47,11 @@ const EditorTheme = Prec.highest(
   })
 );
 
-const Editor = ({ markText, setMarkdown }: EditorProps) => {
+const Editor = ({ markText, onTextChange }: EditorProps) => {
   return (
     <CodeMirror
       value={markText}
-      onChange={setMarkdown}
+      onChange={onTextChange}
       theme={githubDark}
       basicSetup={{
         lineNumbers: false,

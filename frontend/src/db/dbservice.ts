@@ -38,8 +38,16 @@ const NoteService = {
   },
 
   deleteNoteById: async (id: string): Promise<void> => {
-    db.get(id).then((doc) => {
-      db.remove(doc);
+    const doc = await db.get(id);
+    db.remove(doc);
+  },
+
+  updateNoteById: async (id: string, note: Note): Promise<void> => {
+    const doc = await db.get(id);
+    await db.put({
+      _rev: doc._rev,
+      ...note,
+      updatedAt: new Date(),
     });
   },
 

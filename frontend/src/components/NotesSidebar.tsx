@@ -89,11 +89,11 @@ const NotePreview = ({
 const NotesSidebar = ({
   notes,
   selectedNote,
-  setSelectedNote,
+  onSelectNote: setSelectedNote,
 }: {
   notes: Note[];
   selectedNote: Note | null;
-  setSelectedNote: (note: Note) => void;
+  onSelectNote: (note: Note) => void;
 }) => {
   return (
     <Box height="100%">
