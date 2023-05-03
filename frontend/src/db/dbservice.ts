@@ -37,6 +37,12 @@ const NoteService = {
     return doc;
   },
 
+  deleteNoteById: async (id: string): Promise<void> => {
+    db.get(id).then((doc) => {
+      db.remove(doc);
+    });
+  },
+
   subscribe: (onChange: (notes: Note[]) => void) => {
     const changes = db.changes({
       since: "now",

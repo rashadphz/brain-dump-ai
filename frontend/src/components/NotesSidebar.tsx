@@ -9,9 +9,11 @@ import {
   Button,
   Input,
   IconButton,
+  Icon,
 } from "@chakra-ui/react";
 import NoteService, { Note } from "../db/dbservice";
 import { HiOutlinePencilAlt } from "react-icons/hi";
+import { BsTrash } from "react-icons/bs";
 
 const NotePreview = ({
   note,
@@ -21,6 +23,11 @@ const NotePreview = ({
   isSelected: boolean;
 }) => {
   const { title, content, tags } = note;
+
+  const deleteNote = () => {
+    if (note._id) NoteService.deleteNoteById(note._id);
+  };
+
   return (
     <ChakraProvider resetCSS>
       <Box
@@ -32,9 +39,20 @@ const NotePreview = ({
         backgroundColor={isSelected ? "blue.900" : "gray.900"}
       >
         <VStack spacing={2} align="start">
-          <Heading as="h4" size="sm">
-            {title || "Untitled"}
-          </Heading>
+          <HStack justifyContent={"space-between"} width="100%">
+            <Heading as="h4" size="sm">
+              {title || "Untitled"}
+            </Heading>
+            {isSelected && (
+              <IconButton
+                icon={<Icon as={BsTrash} />}
+                aria-label="delete"
+                backgroundColor="transparent"
+                size="xs"
+                onClick={deleteNote}
+              />
+            )}
+          </HStack>
           <VStack align="start" spacing={0}>
             <HStack spacing={2}>
               <Text fontSize="sm" color="blue.300">
