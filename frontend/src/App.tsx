@@ -33,7 +33,7 @@ type EditorProps = {
   setMarkdown: (value: string) => void;
 };
 import React from "react";
-import NoteService, { Note } from "./db/dbservice";
+import NoteService, { Note, NoteChangeType } from "./db/dbservice";
 import Editor from "./components/Editor";
 import Previewer from "./components/Previewer";
 import usePrevious from "./hooks/usePrevious";
@@ -65,10 +65,23 @@ function App() {
   );
 
   useEffect(() => {
-    const changes = NoteService.subscribe((notes) => {
-      setNotes(notes);
-      setSelectedNote(notes[0]);
-    });
+    const changes = NoteService.subscribe(
+      ({ note, changeType: type }) => {
+        console.log("changeType", type);
+
+        if (type == "CREATED") {
+          console.log("CREATED");
+          setNotes((notes) => [note!, ...notes]);
+          setSelectedNote(note!);
+        } else if (type == "UPDATED") {
+        } else if (type == "DELETED") {
+          NoteService.getAllNotes().then((notes) => {
+            setNotes(notes);
+            setSelectedNote(notes[0]);
+          });
+        }
+      }
+    );
 
     return () => {
       changes.cancel();
@@ -175,7 +188,7 @@ function App() {
                 />
               </TabPanel>
               <TabPanel>
-                  <Previewer html={html} />
+                <Previewer html={html} />
               </TabPanel>
             </TabPanels>
           </Tabs>

@@ -9,6 +9,13 @@ export interface Note {
   updatedAt?: Date;
 }
 
+export type NoteChangeType = "CREATED" | "UPDATED" | "DELETED";
+
+export interface NoteChangeObject {
+  changeType: NoteChangeType;
+  note: Note | null;
+}
+
 const db = new PouchDB("notes");
 
 const NoteService = {
@@ -51,15 +58,35 @@ const NoteService = {
     });
   },
 
-  subscribe: (onChange: (notes: Note[]) => void) => {
-    const changes = db.changes({
+  subscribe: (
+    onChange: (noteChangeObj: NoteChangeObject) => void
+  ) => {
+    const changes = db.changes<Note>({
       since: "now",
       live: true,
       include_docs: true,
     });
     changes.on("change", async (change) => {
-      const notes = await NoteService.getAllNotes();
-      onChange(notes);
+      if (!change.doc) return;
+
+      if (change.doc._deleted) {
+        onChange({
+          changeType: "DELETED",
+          note: null,
+        });
+      } else {
+        if (change.doc._rev.startsWith("1-")) {
+          onChange({
+            changeType: "CREATED",
+            note: change.doc,
+          });
+        } else {
+          onChange({
+            changeType: "UPDATED",
+            note: change.doc,
+          });
+        }
+      }
     });
 
     return changes;
