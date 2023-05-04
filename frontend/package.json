@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "generate-client": "rm -f ./openapi.json && wget http://127.0.0.1:8000/openapi.json && python3 openapi_preprocess.py && openapi --input ./openapi.json --output ./src/client --client axios"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.6.0",
@@ -22,6 +23,7 @@
     "@uiw/codemirror-theme-github": "^4.19.16",
     "@uiw/react-codemirror": "^4.19.16",
     "axios": "^1.3.6",
+    "chakra-ui-contextmenu": "^1.0.5",
     "codemirror": "^6.0.1",
     "events": "^3.3.0",
     "framer-motion": "^6",
@@ -42,6 +44,7 @@
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^3.0.0",
+    "openapi-typescript-codegen": "^0.24.0",
     "typescript": "^4.9.5",
     "vite": "^4.2.1"
   }
