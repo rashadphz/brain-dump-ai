@@ -54,4 +54,5 @@ async def completions(completionRequest: CompletionIn):
     ]
 
     result = chat(messages)
-    return CompletionOut(completion=result)
+    content = result.content
+    return CompletionOut(completion=content)
