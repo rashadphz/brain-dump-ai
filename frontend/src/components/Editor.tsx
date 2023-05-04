@@ -9,7 +9,10 @@ import { vim } from "@replit/codemirror-vim";
 
 import "highlight.js/styles/github-dark-dimmed.css";
 import { EditorView } from "codemirror";
-import { githubDark } from "@uiw/codemirror-theme-github";
+import {
+  githubDark,
+  githubDarkInit,
+} from "@uiw/codemirror-theme-github";
 
 type EditorProps = {
   markText: string;
@@ -47,12 +50,26 @@ const EditorTheme = Prec.highest(
   })
 );
 
+import { tags as t } from "@lezer/highlight";
+
+const myTheme = githubDarkInit({
+  settings: {
+    background: "transparent",
+  },
+  styles: [
+    { tag: [t.heading], color: "#89BEFA", fontWeight: "bold" },
+    { tag: t.link, color: "#89BEFA" },
+  ],
+});
+
+import "../bearstyle.css";
+
 const Editor = ({ markText, onTextChange }: EditorProps) => {
   return (
     <CodeMirror
       value={markText}
       onChange={onTextChange}
-      theme={githubDark}
+      theme={myTheme}
       basicSetup={{
         lineNumbers: false,
         foldGutter: false,

@@ -90,6 +90,7 @@ function App() {
       });
     }
     setMarkdown(selectedNote?.content || "");
+    updateHTML(selectedNote?.content || "");
   }, [selectedNote]);
 
   const updateHTML = async (markdown: string) => {
@@ -174,7 +175,7 @@ function App() {
                 />
               </TabPanel>
               <TabPanel>
-                <Previewer html={html} />
+                  <Previewer html={html} />
               </TabPanel>
             </TabPanels>
           </Tabs>
