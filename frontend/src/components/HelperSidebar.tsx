@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FiCheck, FiClipboard, FiCopy } from "react-icons/fi";
-import { Completions } from "../api";
+import { PredictionService, PredictionSizeEnum } from "../client";
 
 const HelperSidebar = ({
   markText,
@@ -34,9 +34,8 @@ const HelperSidebar = ({
   } = useClipboard("This is the inital value");
 
   const [tabIndex, setTabIndex] = useState(0);
-  const [completionType, setCompletionType] = useState<
-    "word" | "sentence" | "multi-line"
-  >("word");
+  const [predictionType, setCompletionType] =
+    useState<PredictionSizeEnum>(PredictionSizeEnum.WORD);
   const [waitingForCompletion, setWaitingForCompletion] =
     useState<boolean>(false);
 
@@ -47,16 +46,16 @@ const HelperSidebar = ({
   useEffect(() => {
     switch (tabIndex) {
       case 0:
-        setCompletionType("word");
+        setCompletionType(PredictionSizeEnum.WORD);
         break;
       case 1:
-        setCompletionType("sentence");
+        setCompletionType(PredictionSizeEnum.SENTENCE);
         break;
       case 2:
-        setCompletionType("multi-line");
+        setCompletionType(PredictionSizeEnum.MULTILINE);
         break;
       default:
-        setCompletionType("word");
+        setCompletionType(PredictionSizeEnum.WORD);
         break;
     }
   }, [tabIndex]);
@@ -64,11 +63,11 @@ const HelperSidebar = ({
   const completeText = async () => {
     setWaitingForCompletion(true);
 
-    const { result } = await Completions.getCompletion(
-      markText,
-      completionType
-    );
-    setCompletionText(result);
+    const { prediction } = await PredictionService.makePrediction({
+      text: markText,
+      predictionSize: predictionType,
+    });
+    setCompletionText(prediction);
     setWaitingForCompletion(false);
   };
 
