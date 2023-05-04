@@ -67,10 +67,7 @@ function App() {
   useEffect(() => {
     const changes = NoteService.subscribe(
       ({ note, changeType: type }) => {
-        console.log("changeType", type);
-
         if (type == "CREATED") {
-          console.log("CREATED");
           setNotes((notes) => [note!, ...notes]);
           setSelectedNote(note!);
         } else if (type == "UPDATED") {
@@ -188,7 +185,7 @@ function App() {
                 />
               </TabPanel>
               <TabPanel>
-                <Previewer html={html} />
+                <Previewer markdown={markText} />
               </TabPanel>
             </TabPanels>
           </Tabs>

@@ -99,3 +99,11 @@
 .markdown-style h6::before {
   content: "H6";
 }
+
+.markdown-style {
+  zoom: 1.2;
+}
+
+.markdown-style code {
+  font-size: 1.8em;
+}
