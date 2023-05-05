@@ -55,6 +55,21 @@ const CommandItem = ({ name, icon }: CommandItemProps) => {
   );
 };
 
+export type ModalSectionProps = {
+  title: string;
+  children: React.ReactNode;
+};
+const ModalSection = ({ title, children }: ModalSectionProps) => {
+  return (
+    <>
+      <Text fontWeight="bold" color="gray.500" fontSize="sm">
+        {title}
+      </Text>
+      <List width="full">{children}</List>
+    </>
+  );
+};
+
 const CommandModal = () => {
   const isOpen = useReduxSelector(
     (state) => state.commandModal.isOpen
@@ -89,23 +104,17 @@ const CommandModal = () => {
             </InputGroup>
           </Box>
           <VStack px={3} align="start" spacing={2}>
-            <Text fontWeight="bold" color="gray.500" fontSize="sm">
-              Recent
-            </Text>
-            <List width="full">
+            <ModalSection title="Recent">
               <CommandItem icon={FiFileText} name="Note 1" />
               <CommandItem icon={FiFileText} name="Note 2" />
               <CommandItem icon={FiFileText} name="Note 3" />
-            </List>
-            <Text fontWeight="bold" color="gray.500" fontSize="sm">
-              Actions
-            </Text>
-            <List width="full">
+            </ModalSection>
+            <ModalSection title="Actions">
               <CommandItem
                 icon={FiFilePlus}
                 name="Create New Note..."
               />
-            </List>
+            </ModalSection>
           </VStack>
         </ModalBody>
         <ModalFooter px={1} py={0}>
