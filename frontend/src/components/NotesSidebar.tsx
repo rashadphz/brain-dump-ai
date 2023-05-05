@@ -109,7 +109,7 @@ const NotesSidebar = ({
   }, [search]);
 
   return (
-    <Box mx="auto" alignItems="flex-start">
+    <Box mx="auto" alignItems="flex-start" width="100%">
       <HStack pl={4} spacing={2} mb={4}>
         <Input
           value={search}
@@ -132,6 +132,7 @@ const NotesSidebar = ({
         direction="column"
         spacing={0}
         align="start"
+        display="block"
         pb={200}
       >
         {notes.map((note) => {
