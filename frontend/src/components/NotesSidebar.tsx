@@ -10,13 +10,18 @@ import {
   IconButton,
   Icon,
   Stack,
+  Button,
+  Flex,
+  Kbd,
 } from "@chakra-ui/react";
 import NoteService, { Note } from "../db/dbservice";
-import { HiOutlinePencilAlt } from "react-icons/hi";
+import { HiOutlinePencilAlt, HiOutlineSearch } from "react-icons/hi";
 import { BsTrash } from "react-icons/bs";
 import { useEffect, useState } from "react";
 
 import moment from "moment";
+import { useReduxSelector, useReduxDispatch } from "../redux/hooks";
+import { handleOpen } from "./CommandModal/commandModalSlice";
 
 const NotePreview = ({
   note,
@@ -100,27 +105,37 @@ const NotesSidebar = ({
   selectedNote: Note | null;
   onSelectNote: (note: Note) => void;
 }) => {
-  const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    const searchNotes = async () => {
-      const notes = await NoteService.searchNotes(search);
-      setNotes(notes);
-    };
-    searchNotes();
-  }, [search]);
+  const dispatch = useReduxDispatch();
 
   return (
     <Box mx="auto" alignItems="flex-start" width="100%">
-      <HStack pl={4} spacing={2} mb={4}>
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search Notes"
-          size="sm"
-        />
+      <HStack px={3} spacing={2} mb={4}>
+        <Button
+          flex={1}
+          onClick={() => dispatch(handleOpen())}
+          width="100%"
+          alignItems="center"
+          rounded="md"
+          shadow="base"
+        >
+          <Icon boxSize={4} as={HiOutlineSearch} color="gray.500" />
+          <HStack
+            w="full"
+            ml={3}
+            spacing={4}
+            justifyContent="space-between"
+          >
+            <Text textAlign="left" color="gray.500" fontSize="sm">
+              Search notes
+            </Text>
+            <HStack spacing={1} textDecoration="none">
+              <Kbd rounded={2}>⌘</Kbd>
+              <Kbd rounded={2}>K</Kbd>
+            </HStack>
+          </HStack>
+        </Button>
         <IconButton
-          aria-label="Search database"
+          aria-label="New Note"
           icon={<HiOutlinePencilAlt />}
           backgroundColor="transparent"
           size="lg"
