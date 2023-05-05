@@ -29,12 +29,14 @@ import {
 import { handleClose } from "./commandModalSlice";
 import React from "react";
 import { AiOutlineSearch, AiOutlineFileText } from "react-icons/ai";
+import { FiFilePlus, FiFileText } from "react-icons/fi";
 
 type CommandItemProps = {
   name: string;
+  icon: React.ElementType;
 };
 
-const CommandItem = ({ name }: CommandItemProps) => {
+const CommandItem = ({ name, icon }: CommandItemProps) => {
   return (
     <ListItem
       cursor="pointer"
@@ -42,8 +44,10 @@ const CommandItem = ({ name }: CommandItemProps) => {
       alignItems="center"
       _hover={{ backgroundColor: "gray.700" }}
       py={1}
+      px={2}
+      borderRadius="md"
     >
-      <ListIcon as={AiOutlineFileText} color="gray.500" />
+      <ListIcon as={icon} color="gray.500" />
       <Text fontWeight="medium" fontSize="sm">
         {name}
       </Text>
@@ -88,14 +92,20 @@ const CommandModal = () => {
             <Text fontWeight="bold" color="gray.500" fontSize="sm">
               Recent
             </Text>
-            <List>
-              <CommandItem name="Note 1" />
-              <CommandItem name="Note 2" />
-              <CommandItem name="Note 2" />
+            <List width="full">
+              <CommandItem icon={FiFileText} name="Note 1" />
+              <CommandItem icon={FiFileText} name="Note 2" />
+              <CommandItem icon={FiFileText} name="Note 3" />
             </List>
             <Text fontWeight="bold" color="gray.500" fontSize="sm">
               Actions
             </Text>
+            <List width="full">
+              <CommandItem
+                icon={FiFilePlus}
+                name="Create New Note..."
+              />
+            </List>
           </VStack>
         </ModalBody>
         <ModalFooter px={1} py={0}>
