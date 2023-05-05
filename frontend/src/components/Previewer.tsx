@@ -158,6 +158,9 @@ const Previewer = ({ markdown }: { markdown: string }) => {
       mx={20}
       fontFamily={"Avenir Next, system-ui, sans-serif"}
       backgroundColor="transparent"
+      overflowY="auto"
+      maxHeight="100vh"
+      pb={200}
     >
       <ReactMarkdown
         components={ChakraUIRenderer({

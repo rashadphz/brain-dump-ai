@@ -132,6 +132,7 @@ const NotesSidebar = ({
         direction="column"
         spacing={0}
         align="start"
+        pb={200}
       >
         {notes.map((note) => {
           const isSelected = note._id === selectedNote?._id;
