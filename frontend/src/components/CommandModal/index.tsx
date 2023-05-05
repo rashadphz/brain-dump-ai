@@ -17,6 +17,10 @@ import {
   ModalOverlay,
   VStack,
   Text,
+  Flex,
+  List,
+  ListItem,
+  ListIcon,
 } from "@chakra-ui/react";
 import {
   useReduxDispatch,
@@ -24,7 +28,28 @@ import {
 } from "../../redux/hooks";
 import { handleClose } from "./commandModalSlice";
 import React from "react";
-import { AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineSearch, AiOutlineFileText } from "react-icons/ai";
+
+type CommandItemProps = {
+  name: string;
+};
+
+const CommandItem = ({ name }: CommandItemProps) => {
+  return (
+    <ListItem
+      cursor="pointer"
+      display="flex"
+      alignItems="center"
+      _hover={{ backgroundColor: "gray.700" }}
+      py={1}
+    >
+      <ListIcon as={AiOutlineFileText} color="gray.500" />
+      <Text fontWeight="medium" fontSize="sm">
+        {name}
+      </Text>
+    </ListItem>
+  );
+};
 
 const CommandModal = () => {
   const isOpen = useReduxSelector(
@@ -59,7 +84,19 @@ const CommandModal = () => {
               </InputLeftElement>
             </InputGroup>
           </Box>
-          <VStack align="start" spacing={2}></VStack>
+          <VStack px={3} align="start" spacing={2}>
+            <Text fontWeight="bold" color="gray.500" fontSize="sm">
+              Recent
+            </Text>
+            <List>
+              <CommandItem name="Note 1" />
+              <CommandItem name="Note 2" />
+              <CommandItem name="Note 2" />
+            </List>
+            <Text fontWeight="bold" color="gray.500" fontSize="sm">
+              Actions
+            </Text>
+          </VStack>
         </ModalBody>
         <ModalFooter px={1} py={0}>
           <HStack
