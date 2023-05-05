@@ -116,7 +116,6 @@ const baseTheme: typeof defaults = {
   },
   p: (props) => {
     const { children, node } = props;
-    console.log(children);
     if (!node || !children || !children[0] || children.length > 1) {
       return <p {...props} />;
     }

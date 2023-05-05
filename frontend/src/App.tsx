@@ -56,18 +56,27 @@ function App() {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const prevSelectedNote = usePrevious(selectedNote);
 
-  const getHTMLTitle = (html: string) => {
-    const match = html.match(/# (.*)$/m);
+  const getNoteTitle = (mkdn: string): string => {
+    const match = mkdn.match(/# (.*)$/m);
     return match ? match[1] : "Untitled";
+  };
+
+  const getNoteTags = (mkdn: string): string[] => {
+    const regex = /^(?!<![-|>])#(\w+\b)+/g; // match all hashtags, ignore ul/li
+    const matches = mkdn.match(regex);
+    return matches ? matches.map((m) => m.slice(2)) : [];
   };
 
   const saveNote = useCallback(
     debounce((modifiedNote: Note) => {
       if (!modifiedNote._id) return;
-      const title = getHTMLTitle(modifiedNote.content);
+      const title = getNoteTitle(modifiedNote.content);
+      const tags = getNoteTags(modifiedNote.content);
+
       NoteService.updateNoteById(modifiedNote._id, {
         ...modifiedNote,
         title,
+        tags,
       });
     }, 1000),
     []
@@ -108,7 +117,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (prevSelectedNote && prevSelectedNote._id) {
+    if (
+      prevSelectedNote &&
+      prevSelectedNote._id != selectedNote?._id
+    ) {
       saveNote({
         ...prevSelectedNote,
         content: markText,
