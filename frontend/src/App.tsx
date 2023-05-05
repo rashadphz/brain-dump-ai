@@ -162,14 +162,13 @@ function App() {
   return (
     <Box
       bg="gray.900"
-      height="full"
       fontSize="md"
-      minH="100vh"
+      height="100%"
       textAlign="left"
       w="100%"
       pt={10}
       pr={5}
-      overflow="auto"
+      overflow="hidden"
     >
       <Flex mx="auto" height="100%" alignItems="flex-start">
         <Box
