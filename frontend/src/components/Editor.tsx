@@ -60,13 +60,22 @@ const myTheme = githubDarkInit({
 
 import "../bearstyle.css";
 import { Box } from "@chakra-ui/react";
+import { useReduxDispatch, useReduxSelector } from "../redux/hooks";
+import { handleRawTextChange } from "../features/markdownParser/markdownParserSlice";
 
-const Editor = ({ markText, onTextChange }: EditorProps) => {
+const Editor = () => {
+  const rawText = useReduxSelector(
+    (state) => state.markdownParser.rawText
+  );
+  const dispatch = useReduxDispatch();
+
   return (
     <Box maxHeight="100vh" overflowY="auto" pb={200}>
       <CodeMirror
-        value={markText}
-        onChange={onTextChange}
+        value={rawText}
+        onChange={(value) => {
+          dispatch(handleRawTextChange(value));
+        }}
         theme={myTheme}
         basicSetup={{
           lineNumbers: false,

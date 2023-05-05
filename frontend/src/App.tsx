@@ -26,18 +26,13 @@ import "github-markdown-css/github-markdown-dark.css";
 import HelperSidebar from "./components/HelperSidebar";
 import NotesSidebar from "./components/NotesSidebar";
 
-type ViewMode = "markdown" | "preview" | "split";
-
-type EditorProps = {
-  markText: string;
-  setMarkdown: (value: string) => void;
-};
 import React from "react";
 import NoteService, { Note, NoteChangeType } from "./db/dbservice";
 import Editor from "./components/Editor";
 import Previewer from "./components/Previewer";
-import usePrevious from "./hooks/usePrevious";
 import CommandModal from "./components/CommandModal";
+import { useReduxDispatch } from "./redux/hooks";
+import { globalNoteOpen } from "./features/notes/noteSlice";
 
 const debounce = (fn: Function, ms = 300) => {
   let timeoutId: ReturnType<typeof setTimeout>;
@@ -48,14 +43,8 @@ const debounce = (fn: Function, ms = 300) => {
 };
 
 function App() {
-  const [markText, setMarkdown] = useState("");
-  const [html, setHTML] = useState("");
-  const [showPreview, setShowPreview] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>("split");
-
   const [notes, setNotes] = useState<Note[]>([]);
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
-  const prevSelectedNote = usePrevious(selectedNote);
+  const dispatch = useReduxDispatch();
 
   const getNoteTitle = (mkdn: string): string => {
     const match = mkdn.match(/# (.*)$/m);
@@ -83,60 +72,39 @@ function App() {
     []
   );
 
-  useEffect(() => {
-    const changes = NoteService.subscribe(
-      ({ note, changeType: type }) => {
-        if (type == "CREATED") {
-          setNotes((notes) => [note!, ...notes]);
-          setSelectedNote(note!);
-        } else if (type == "UPDATED") {
-          setNotes((notes) =>
-            notes.map((n) => (n._id == note!._id ? note! : n))
-          );
-          setSelectedNote((prev) =>
-            prev?._id == note!._id ? note! : prev
-          );
-        } else if (type == "DELETED") {
-          NoteService.getAllNotes().then((notes) => {
-            setNotes(notes);
-            setSelectedNote(notes[0]);
-          });
-        }
-      }
-    );
+  //   useEffect(() => {
+  //     const changes = NoteService.subscribe(
+  //       ({ note, changeType: type }) => {
+  //         if (type == "CREATED") {
+  //           setNotes((notes) => [note!, ...notes]);
+  //           setSelectedNote(note!);
+  //         } else if (type == "UPDATED") {
+  //           setNotes((notes) =>
+  //             notes.map((n) => (n._id == note!._id ? note! : n))
+  //           );
+  //           setSelectedNote((prev) =>
+  //             prev?._id == note!._id ? note! : prev
+  //           );
+  //         } else if (type == "DELETED") {
+  //           NoteService.getAllNotes().then((notes) => {
+  //             setNotes(notes);
+  //             setSelectedNote(notes[0]);
+  //           });
+  //         }
+  //       }
+  //     );
 
-    return () => {
-      changes.cancel();
-    };
-  }, []);
+  //     return () => {
+  //       changes.cancel();
+  //     };
+  //   }, []);
 
   useEffect(() => {
     NoteService.getAllNotes().then((notes) => {
       setNotes(notes);
-      setSelectedNote(notes[0]);
+      dispatch(globalNoteOpen({ ...notes[0] }));
     });
   }, []);
-
-  useEffect(() => {
-    if (
-      prevSelectedNote &&
-      prevSelectedNote._id != selectedNote?._id
-    ) {
-      saveNote({
-        ...prevSelectedNote,
-        content: markText,
-      });
-    }
-    setMarkdown(selectedNote?.content || "");
-  }, [selectedNote]);
-
-  const handleEditorTextChange = (value: string) => {
-    saveNote({
-      ...selectedNote,
-      content: value,
-    });
-    setMarkdown(value);
-  };
 
   const CustomTab = React.forwardRef(
     (props: any, ref: React.Ref<any>) => {
@@ -179,12 +147,7 @@ function App() {
           background="gray.900"
           height="100vh"
         >
-          <NotesSidebar
-            notes={notes}
-            setNotes={setNotes}
-            selectedNote={selectedNote}
-            onSelectNote={setSelectedNote}
-          />
+          <NotesSidebar notes={notes} />
         </Box>
         <Box w="70%" px={2} marginRight="1rem">
           <Tabs isLazy>
@@ -194,13 +157,10 @@ function App() {
             </TabList>
             <TabPanels>
               <TabPanel>
-                <Editor
-                  markText={markText}
-                  onTextChange={handleEditorTextChange}
-                />
+                <Editor />
               </TabPanel>
               <TabPanel>
-                <Previewer markdown={markText} />
+                <Previewer />
               </TabPanel>
             </TabPanels>
           </Tabs>

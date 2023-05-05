@@ -20,6 +20,8 @@ import remarkGfm from "remark-gfm";
 import ChakraUIRenderer, {
   defaults,
 } from "chakra-ui-markdown-renderer";
+import { useReduxSelector } from "../redux/hooks";
+import React from "react";
 
 const baseHeadingProps = {
   fontFamily: "Avenir Next, system-ui, sans-serif",
@@ -144,13 +146,17 @@ const baseTheme: typeof defaults = {
   a: (props) => <Link color="#44a2e5" {...props} />,
 };
 
-const Previewer = ({ markdown }: { markdown: string }) => {
+const Previewer = () => {
+  const rawText = useReduxSelector(
+    (state) => state.markdownParser.rawText
+  );
+
   useEffect(() => {
     hljs.configure({
       cssSelector: "code",
     });
     hljs.highlightAll();
-  }, [markdown]);
+  }, [rawText]);
 
   return (
     <Box
@@ -166,11 +172,11 @@ const Previewer = ({ markdown }: { markdown: string }) => {
         components={ChakraUIRenderer({
           ...baseTheme,
         })}
-        children={markdown}
+        children={rawText}
         remarkPlugins={[remarkGfm]}
       />
     </Box>
   );
 };
 
-export default Previewer;
+export default React.memo(Previewer);

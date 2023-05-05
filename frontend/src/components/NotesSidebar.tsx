@@ -17,11 +17,11 @@ import {
 import NoteService, { Note } from "../db/dbservice";
 import { HiOutlinePencilAlt, HiOutlineSearch } from "react-icons/hi";
 import { BsTrash } from "react-icons/bs";
-import { useEffect, useState } from "react";
 
 import moment from "moment";
 import { useReduxSelector, useReduxDispatch } from "../redux/hooks";
 import { handleOpen } from "./CommandModal/commandModalSlice";
+import { globalNoteOpen } from "../features/notes/noteSlice";
 
 const NotePreview = ({
   note,
@@ -94,17 +94,10 @@ const NotePreview = ({
   );
 };
 
-const NotesSidebar = ({
-  notes,
-  setNotes,
-  selectedNote,
-  onSelectNote: setSelectedNote,
-}: {
-  notes: Note[];
-  setNotes: (notes: Note[]) => void;
-  selectedNote: Note | null;
-  onSelectNote: (note: Note) => void;
-}) => {
+const NotesSidebar = ({ notes }: { notes: Note[] }) => {
+  const currentNote = useReduxSelector(
+    (state) => state.note.selectedNote
+  );
   const dispatch = useReduxDispatch();
 
   return (
@@ -153,9 +146,11 @@ const NotesSidebar = ({
         pb={200}
       >
         {notes.map((note) => {
-          const isSelected = note._id === selectedNote?._id;
+          const isSelected = note._id === currentNote?._id;
           return (
-            <Box onClick={() => setSelectedNote(note)}>
+            <Box
+              onClick={() => dispatch(globalNoteOpen({ ...note }))}
+            >
               <NotePreview isSelected={isSelected} note={note} />
             </Box>
           );

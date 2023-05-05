@@ -17,16 +17,9 @@ export const markdownParserSlice = createSlice({
     handleRawTextChange: (state, action: PayloadAction<string>) => {
       state.rawText = action.payload;
     },
-    handleParsedTextChange: (
-      state,
-      action: PayloadAction<string>
-    ) => {
-      state.parsedText = action.payload;
-    },
   },
 });
 
-export const { handleRawTextChange, handleParsedTextChange } =
-  markdownParserSlice.actions;
+export const { handleRawTextChange } = markdownParserSlice.actions;
 
 export default markdownParserSlice.reducer;
