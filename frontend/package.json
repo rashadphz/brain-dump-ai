@@ -36,6 +36,7 @@
     "marked-react": "^1.3.2",
     "pouchdb": "^8.0.1",
     "pouchdb-find": "^8.0.1",
+    "pouchdb-quick-search": "^1.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",

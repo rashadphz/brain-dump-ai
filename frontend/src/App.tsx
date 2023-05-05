@@ -181,6 +181,7 @@ function App() {
         >
           <NotesSidebar
             notes={notes}
+            setNotes={setNotes}
             selectedNote={selectedNote}
             onSelectNote={setSelectedNote}
           />

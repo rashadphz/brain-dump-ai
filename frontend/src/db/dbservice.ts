@@ -1,4 +1,7 @@
 import PouchDB from "pouchdb";
+import PouchDBFind from "pouchdb-find";
+
+PouchDB.plugin(PouchDBFind);
 
 export interface Note {
   _id?: string;
@@ -56,6 +59,30 @@ const NoteService = {
       _rev: doc._rev,
       updatedAt: new Date(),
     });
+  },
+
+  searchNotes: async (query: string): Promise<Note[]> => {
+    if (!query) return await NoteService.getAllNotes();
+
+    await db.createIndex({
+      index: {
+        fields: ["title", "content", "tags"],
+      },
+    });
+
+    const regex = new RegExp(query, "i");
+
+    const { docs } = await db.find({
+      selector: {
+        $or: [
+          { title: { $regex: regex } },
+          { content: { $regex: regex } },
+          { tags: { $regex: regex } },
+        ],
+      },
+    });
+
+    return docs as unknown as Note[];
   },
 
   subscribe: (

@@ -14,6 +14,7 @@ import {
 import NoteService, { Note } from "../db/dbservice";
 import { HiOutlinePencilAlt } from "react-icons/hi";
 import { BsTrash } from "react-icons/bs";
+import { useEffect, useState } from "react";
 
 const NotePreview = ({
   note,
@@ -88,18 +89,35 @@ const NotePreview = ({
 
 const NotesSidebar = ({
   notes,
+  setNotes,
   selectedNote,
   onSelectNote: setSelectedNote,
 }: {
   notes: Note[];
+  setNotes: (notes: Note[]) => void;
   selectedNote: Note | null;
   onSelectNote: (note: Note) => void;
 }) => {
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const searchNotes = async () => {
+      const notes = await NoteService.searchNotes(search);
+      setNotes(notes);
+    };
+    searchNotes();
+  }, [search]);
+
   return (
     <Box height="100%">
       <Box mx="auto" height="100%" alignItems="flex-start">
         <HStack pl={4} spacing={2} mb={4}>
-          <Input placeholder="Search Notes" size="sm" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search Notes"
+            size="sm"
+          />
           <IconButton
             aria-label="Search database"
             icon={<HiOutlinePencilAlt />}
