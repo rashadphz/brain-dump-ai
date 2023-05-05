@@ -1,5 +1,6 @@
 import PouchDB from "pouchdb";
 import PouchDBFind from "pouchdb-find";
+import { sortBy } from "lodash";
 
 PouchDB.plugin(PouchDBFind);
 
@@ -23,10 +24,14 @@ const db = new PouchDB("notes");
 
 const NoteService = {
   getAllNotes: async (): Promise<Note[]> => {
-    const { rows } = await db.allDocs<Note>({
-      include_docs: true,
-    });
-    return rows.map(({ doc }) => doc) as Note[];
+    return db
+      .allDocs<Note>({
+        include_docs: true,
+      })
+      .then((res) => {
+        const docs = res.rows.map((row) => row.doc);
+        return sortBy(docs, "updatedAt").reverse() as Note[];
+      });
   },
 
   createNote: async (): Promise<Note> => {
