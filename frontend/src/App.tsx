@@ -56,10 +56,19 @@ function App() {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const prevSelectedNote = usePrevious(selectedNote);
 
+  const getHTMLTitle = (html: string) => {
+    const match = html.match(/# (.*)$/m);
+    return match ? match[1] : "Untitled";
+  };
+
   const saveNote = useCallback(
     debounce((modifiedNote: Note) => {
       if (!modifiedNote._id) return;
-      NoteService.updateNoteById(modifiedNote._id, modifiedNote);
+      const title = getHTMLTitle(modifiedNote.content);
+      NoteService.updateNoteById(modifiedNote._id, {
+        ...modifiedNote,
+        title,
+      });
     }, 1000),
     []
   );
@@ -71,6 +80,12 @@ function App() {
           setNotes((notes) => [note!, ...notes]);
           setSelectedNote(note!);
         } else if (type == "UPDATED") {
+          setNotes((notes) =>
+            notes.map((n) => (n._id == note!._id ? note! : n))
+          );
+          setSelectedNote((prev) =>
+            prev?._id == note!._id ? note! : prev
+          );
         } else if (type == "DELETED") {
           NoteService.getAllNotes().then((notes) => {
             setNotes(notes);
@@ -100,26 +115,13 @@ function App() {
       });
     }
     setMarkdown(selectedNote?.content || "");
-    updateHTML(selectedNote?.content || "");
   }, [selectedNote]);
-
-  const updateHTML = async (markdown: string) => {
-    try {
-      const html = await invoke<string>("parse_markdown", {
-        markdown,
-      });
-      setHTML(html);
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   const handleEditorTextChange = (value: string) => {
     saveNote({
       ...selectedNote,
       content: value,
     });
-    updateHTML(value);
     setMarkdown(value);
   };
 

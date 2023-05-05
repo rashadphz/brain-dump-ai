@@ -52,8 +52,8 @@ const NoteService = {
   updateNoteById: async (id: string, note: Note): Promise<void> => {
     const doc = await db.get(id);
     await db.put({
-      _rev: doc._rev,
       ...note,
+      _rev: doc._rev,
       updatedAt: new Date(),
     });
   },
