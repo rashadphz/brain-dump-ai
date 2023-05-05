@@ -6,10 +6,10 @@ import {
   VStack,
   ChakraProvider,
   HStack,
-  Button,
   Input,
   IconButton,
   Icon,
+  Stack,
 } from "@chakra-ui/react";
 import NoteService, { Note } from "../db/dbservice";
 import { HiOutlinePencilAlt } from "react-icons/hi";
@@ -109,23 +109,30 @@ const NotesSidebar = ({
   }, [search]);
 
   return (
-    <Box height="100%">
-      <Box mx="auto" height="100%" alignItems="flex-start">
-        <HStack pl={4} spacing={2} mb={4}>
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search Notes"
-            size="sm"
-          />
-          <IconButton
-            aria-label="Search database"
-            icon={<HiOutlinePencilAlt />}
-            backgroundColor="transparent"
-            size="lg"
-            onClick={NoteService.createNote}
-          />
-        </HStack>
+    <Box mx="auto" alignItems="flex-start">
+      <HStack pl={4} spacing={2} mb={4}>
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search Notes"
+          size="sm"
+        />
+        <IconButton
+          aria-label="Search database"
+          icon={<HiOutlinePencilAlt />}
+          backgroundColor="transparent"
+          size="lg"
+          onClick={NoteService.createNote}
+        />
+      </HStack>
+      <Stack
+        maxH="100vh"
+        overflowY="auto"
+        overflowX="hidden"
+        direction="column"
+        spacing={0}
+        align="start"
+      >
         {notes.map((note) => {
           const isSelected = note._id === selectedNote?._id;
           return (
@@ -134,7 +141,7 @@ const NotesSidebar = ({
             </Box>
           );
         })}
-      </Box>
+      </Stack>
     </Box>
   );
 };
