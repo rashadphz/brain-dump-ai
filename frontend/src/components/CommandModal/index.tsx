@@ -34,9 +34,14 @@ import { FiFilePlus, FiFileText } from "react-icons/fi";
 type CommandItemProps = {
   name: string;
   icon: React.ElementType;
+  rightElement?: React.ReactNode;
 };
 
-const CommandItem = ({ name, icon }: CommandItemProps) => {
+const CommandItem = ({
+  name,
+  icon,
+  rightElement,
+}: CommandItemProps) => {
   return (
     <ListItem
       cursor="pointer"
@@ -46,11 +51,15 @@ const CommandItem = ({ name, icon }: CommandItemProps) => {
       py={1}
       px={2}
       borderRadius="md"
+      justifyContent="space-between"
     >
-      <ListIcon as={icon} color="gray.500" />
-      <Text fontWeight="medium" fontSize="sm">
-        {name}
-      </Text>
+      <Flex alignItems="center">
+        <ListIcon as={icon} color="gray.500" />
+        <Text fontWeight="medium" fontSize="sm">
+          {name}
+        </Text>
+      </Flex>
+      {rightElement}
     </ListItem>
   );
 };
@@ -81,8 +90,9 @@ const CommandModal = () => {
       size="2xl"
       isOpen={isOpen}
       onClose={() => dispatch(handleClose())}
+      isCentered
     >
-      <ModalOverlay />
+      <ModalOverlay backdropFilter="blur(2px)" />
       <ModalContent
         backgroundColor="gray.900"
         color="white"
@@ -113,6 +123,11 @@ const CommandModal = () => {
               <CommandItem
                 icon={FiFilePlus}
                 name="Create New Note..."
+                rightElement={
+                  <Text fontSize="md" color="gray.500">
+                    <Kbd>⌘</Kbd> + <Kbd>N</Kbd>
+                  </Text>
+                }
               />
             </ModalSection>
           </VStack>
