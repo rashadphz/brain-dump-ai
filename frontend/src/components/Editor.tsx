@@ -60,8 +60,35 @@ const myTheme = githubDarkInit({
 
 import "../bearstyle.css";
 import { Box } from "@chakra-ui/react";
+import { useReduxDispatch, useReduxSelector } from "../redux/hooks";
+import { keymap } from "@codemirror/view";
+import {
+  handleClose,
+  handleOpen,
+} from "./CommandModal/commandModalSlice";
 
 const Editor = ({ markText, onTextChange }: EditorProps) => {
+  const commandModalIsOpen = useReduxSelector(
+    (state) => state.commandModal.isOpen
+  );
+  const dispatch = useReduxDispatch();
+
+  const keyMap = [
+    keymap.of([
+      {
+        key: "Cmd-k",
+        run: () => {
+          if (commandModalIsOpen) {
+            dispatch(handleClose());
+          } else {
+            dispatch(handleOpen());
+          }
+          return true;
+        },
+      },
+    ]),
+  ];
+
   return (
     <Box maxHeight="100vh" overflowY="auto" pb={200}>
       <CodeMirror
@@ -81,6 +108,7 @@ const Editor = ({ markText, onTextChange }: EditorProps) => {
           }),
           EditorView.lineWrapping,
           vim(),
+          ...keyMap,
         ]}
       />
     </Box>
