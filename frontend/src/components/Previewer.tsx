@@ -4,9 +4,12 @@ import { useEffect } from "react";
 import {
   Box,
   Checkbox,
+  HStack,
   Heading,
   Link,
   ListItem,
+  Tag,
+  TagLabel,
   UnorderedList,
 } from "@chakra-ui/react";
 
@@ -38,6 +41,7 @@ for (const [header, fontSize] of headerMap) {
   baseHeaders[header] = (props: any) => (
     <Heading
       fontSize={fontSize}
+      py={2}
       {...baseHeadingProps}
       {...props}
       as={header}
@@ -96,6 +100,50 @@ const baseTheme: typeof defaults = {
   ),
   input: (props) => {
     return <></>;
+  },
+  code: (props: any) => {
+    return (
+      <Box
+        as="code"
+        fontFamily="mono"
+        fontSize="0.85em"
+        borderColor="gray.500"
+        borderWidth="1px"
+        borderRadius="lg"
+        {...props}
+      />
+    );
+  },
+  p: (props) => {
+    const { children, node } = props;
+    console.log(children);
+    if (!node || !children || !children[0] || children.length > 1) {
+      return <p {...props} />;
+    }
+    const text = children[0].toString();
+    const regex = /(#\w+\b)+/g;
+    const segments = text
+      .split(regex)
+      .filter((s) => s !== " " && s !== "");
+
+    const result = segments.map((segment) => {
+      if (segment.startsWith("#")) {
+        return (
+          <Tag
+            onClick={() => console.log("clicked" + segment)}
+            _hover={{ cursor: "pointer" }}
+            size="md"
+            colorScheme="blue"
+            borderRadius="2xl"
+          >
+            <TagLabel>{segment}</TagLabel>
+          </Tag>
+        );
+      }
+      return <p {...props}>{segment}</p>;
+    });
+
+    return <HStack spacing={2}>{result}</HStack>;
   },
 };
 
