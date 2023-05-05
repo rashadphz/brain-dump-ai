@@ -16,6 +16,8 @@ import { HiOutlinePencilAlt } from "react-icons/hi";
 import { BsTrash } from "react-icons/bs";
 import { useEffect, useState } from "react";
 
+import moment from "moment";
+
 const NotePreview = ({
   note,
   isSelected,
@@ -57,7 +59,7 @@ const NotePreview = ({
           <VStack align="start" spacing={0}>
             <HStack spacing={2}>
               <Text fontSize="sm" color="blue.300">
-                a few seconds
+                {moment(note.createdAt).fromNow()}
               </Text>
               {tags &&
                 tags.map((tag) => (
