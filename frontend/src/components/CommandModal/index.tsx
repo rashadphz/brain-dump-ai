@@ -111,6 +111,12 @@ const CommandModal = () => {
               <InputLeftElement pointerEvents="none">
                 <Icon as={AiOutlineSearch} color="gray.300" />
               </InputLeftElement>
+              <InputRightElement mx={2} pointerEvents="none">
+                <Text fontSize="md" color="gray.500">
+                  <Kbd>⌘</Kbd>
+                  <Kbd>K</Kbd>
+                </Text>
+              </InputRightElement>
             </InputGroup>
           </Box>
           <VStack px={3} align="start" spacing={2}>
