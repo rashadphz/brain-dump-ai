@@ -11,6 +11,7 @@ import {
   Tag,
   TagLabel,
   UnorderedList,
+  Text,
 } from "@chakra-ui/react";
 
 import "../bearstyle.css";
@@ -93,11 +94,6 @@ const baseTheme: typeof defaults = {
       />
     );
   },
-  a: (props: any) => (
-    <Link color="#44a2e5" {...props}>
-      {props.children}
-    </Link>
-  ),
   input: (props) => {
     return <></>;
   },
@@ -110,6 +106,7 @@ const baseTheme: typeof defaults = {
         borderColor="gray.500"
         borderWidth="1px"
         borderRadius="lg"
+        my={4}
         {...props}
       />
     );
@@ -117,7 +114,7 @@ const baseTheme: typeof defaults = {
   p: (props) => {
     const { children, node } = props;
     if (!node || !children || !children[0] || children.length > 1) {
-      return <p {...props} />;
+      return <Text mb={5} as="p" {...props} />;
     }
     const text = children[0].toString();
     const regex = /(#\w+\b)+/g;
@@ -139,11 +136,12 @@ const baseTheme: typeof defaults = {
           </Tag>
         );
       }
-      return <p {...props}>{segment}</p>;
+      return <Text mb={5} as="p" {...props} />;
     });
 
     return <HStack spacing={2}>{result}</HStack>;
   },
+  a: (props) => <Link color="#44a2e5" {...props} />,
 };
 
 const Previewer = ({ markdown }: { markdown: string }) => {

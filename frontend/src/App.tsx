@@ -19,7 +19,7 @@ import {
   useMultiStyleConfig,
   useTab,
 } from "@chakra-ui/react";
-import { FiEye, FiEyeOff, FiMoon, FiSun } from "react-icons/fi";
+import { CgScreen } from "react-icons/cg";
 import { FaMarkdown } from "react-icons/fa";
 import "github-markdown-css/github-markdown-dark.css";
 
@@ -146,7 +146,7 @@ function App() {
 
       return (
         <Button
-          leftIcon={index == 0 ? <FaMarkdown /> : <FiEye />}
+          leftIcon={index == 0 ? <FaMarkdown /> : <CgScreen />}
           __css={styles.tab}
           borderRadius="0"
           border={0}
