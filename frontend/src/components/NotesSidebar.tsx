@@ -21,7 +21,10 @@ import { BsTrash } from "react-icons/bs";
 import moment from "moment";
 import { useReduxSelector, useReduxDispatch } from "../redux/hooks";
 import { handleOpen } from "./CommandModal/commandModalSlice";
-import { globalNoteOpen } from "../features/notes/noteSlice";
+import {
+  globalNoteCreate,
+  globalNoteOpen,
+} from "../features/notes/noteSlice";
 
 const NotePreview = ({
   note,
@@ -132,7 +135,7 @@ const NotesSidebar = ({ notes }: { notes: Note[] }) => {
           icon={<HiOutlinePencilAlt />}
           backgroundColor="transparent"
           size="lg"
-          onClick={NoteService.createNote}
+          onClick={() => dispatch(globalNoteCreate())}
         />
       </HStack>
       <Stack
