@@ -32,10 +32,6 @@ const EditorTheme = Prec.highest(
     ".cm-gutters": {
       minHeight: "200px",
     },
-    ".cm-scroller": {
-      overflow: "auto",
-      maxHeight: "600px",
-    },
     ".cm-fat-cursor": {
       position: "absolute",
       background: "#AEAFAD",
@@ -63,28 +59,31 @@ const myTheme = githubDarkInit({
 });
 
 import "../bearstyle.css";
+import { Box } from "@chakra-ui/react";
 
 const Editor = ({ markText, onTextChange }: EditorProps) => {
   return (
-    <CodeMirror
-      value={markText}
-      onChange={onTextChange}
-      theme={myTheme}
-      basicSetup={{
-        lineNumbers: false,
-        foldGutter: false,
-        highlightActiveLine: false,
-      }}
-      extensions={[
-        EditorTheme,
-        markdown({
-          base: markdownLanguage,
-          codeLanguages: languages,
-        }),
-        EditorView.lineWrapping,
-        vim(),
-      ]}
-    />
+    <Box maxHeight="100vh" overflowY="auto" pb={200}>
+      <CodeMirror
+        value={markText}
+        onChange={onTextChange}
+        theme={myTheme}
+        basicSetup={{
+          lineNumbers: false,
+          foldGutter: false,
+          highlightActiveLine: false,
+        }}
+        extensions={[
+          EditorTheme,
+          markdown({
+            base: markdownLanguage,
+            codeLanguages: languages,
+          }),
+          EditorView.lineWrapping,
+          vim(),
+        ]}
+      />
+    </Box>
   );
 };
 
