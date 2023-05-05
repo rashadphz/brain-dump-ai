@@ -62,9 +62,9 @@ function App() {
   };
 
   const getNoteTags = (mkdn: string): string[] => {
-    const regex = /^(?!<![-|>])#(\w+\b)+/g; // match all hashtags, ignore ul/li
+    const regex = /(?![-|>])#(\w+\b)+/g;
     const matches = mkdn.match(regex);
-    return matches ? matches.map((m) => m.slice(2)) : [];
+    return matches ? matches.map((m) => m.slice(1)) : [];
   };
 
   const saveNote = useCallback(
