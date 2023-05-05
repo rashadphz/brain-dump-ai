@@ -91,7 +91,6 @@ const CommandModal = () => {
 
       if (isOpen) dispatch(handleClose());
       else dispatch(handleOpen());
-
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -121,6 +120,10 @@ const CommandModal = () => {
                 width="full"
                 shadow="none"
                 _focus={{ shadow: "none", border: "none" }}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
               />
               <InputLeftElement pointerEvents="none">
                 <Icon as={AiOutlineSearch} color="gray.300" />
