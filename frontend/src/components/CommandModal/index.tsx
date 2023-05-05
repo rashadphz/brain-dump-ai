@@ -26,8 +26,8 @@ import {
   useReduxDispatch,
   useReduxSelector,
 } from "../../redux/hooks";
-import { handleClose } from "./commandModalSlice";
-import React from "react";
+import { handleClose, handleOpen } from "./commandModalSlice";
+import React, { useEffect } from "react";
 import { AiOutlineSearch, AiOutlineFileText } from "react-icons/ai";
 import { FiFilePlus, FiFileText } from "react-icons/fi";
 
@@ -84,6 +84,20 @@ const CommandModal = () => {
     (state) => state.commandModal.isOpen
   );
   const dispatch = useReduxDispatch();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!(e.metaKey && e.key === "k")) return;
+
+      if (isOpen) dispatch(handleClose());
+      else dispatch(handleOpen());
+
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
 
   return (
     <Modal
