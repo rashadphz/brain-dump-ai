@@ -155,7 +155,7 @@ const Previewer = ({ markdown }: { markdown: string }) => {
   return (
     <Box
       className="markdown-style"
-      mx={20}
+      px={20}
       fontFamily={"Avenir Next, system-ui, sans-serif"}
       backgroundColor="transparent"
       overflowY="auto"
