@@ -37,6 +37,7 @@ import NoteService, { Note, NoteChangeType } from "./db/dbservice";
 import Editor from "./components/Editor";
 import Previewer from "./components/Previewer";
 import usePrevious from "./hooks/usePrevious";
+import CommandModal from "./components/CommandModal";
 
 const debounce = (fn: Function, ms = 300) => {
   let timeoutId: ReturnType<typeof setTimeout>;
@@ -185,7 +186,7 @@ function App() {
             onSelectNote={setSelectedNote}
           />
         </Box>
-        <Box w="70%" px={2} marginRight="2rem">
+        <Box w="70%" px={2} marginRight="1rem">
           <Tabs isLazy>
             <TabList>
               <CustomTab index={0}>Write</CustomTab>
@@ -217,6 +218,7 @@ function App() {
           />
         </Box> */}
       </Flex>
+      <CommandModal />
     </Box>
   );
 }
