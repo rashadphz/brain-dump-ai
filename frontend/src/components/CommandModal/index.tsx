@@ -27,9 +27,12 @@ import {
   useReduxSelector,
 } from "../../redux/hooks";
 import { handleClose, handleOpen } from "./commandModalSlice";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlineSearch, AiOutlineFileText } from "react-icons/ai";
 import { FiFilePlus, FiFileText } from "react-icons/fi";
+import NoteService, { Note } from "../../db/dbservice";
+import { take } from "lodash";
+import TagBadge from "../TagBadge";
 
 type CommandItemProps = {
   name: string;
@@ -64,6 +67,39 @@ const CommandItem = ({
   );
 };
 
+type NoteItemProps = {
+  name: string;
+  icon: React.ElementType;
+  tags: string[];
+};
+
+const NoteItem = ({ name, icon, tags }: NoteItemProps) => {
+  return (
+    <ListItem
+      cursor="pointer"
+      display="flex"
+      alignItems="center"
+      _hover={{ backgroundColor: "gray.700" }}
+      py={1}
+      px={2}
+      borderRadius="md"
+      justifyContent="space-between"
+    >
+      <Flex alignItems="center">
+        <ListIcon as={icon} color="gray.500" />
+        <Text fontWeight="medium" fontSize="sm">
+          {name}
+        </Text>
+      </Flex>
+      <HStack spacing={1}>
+        {take(tags, 2).map((tag) => (
+          <TagBadge tag={tag} />
+        ))}
+      </HStack>
+    </ListItem>
+  );
+};
+
 export type ModalSectionProps = {
   title: string;
   children: React.ReactNode;
@@ -84,6 +120,19 @@ const CommandModal = () => {
     (state) => state.commandModal.isOpen
   );
   const dispatch = useReduxDispatch();
+
+  const [search, setSearch] = useState("");
+  const [searchResultNotes, setSearchResultNotes] = useState<Note[]>(
+    []
+  );
+
+  useEffect(() => {
+    const searchNotes = async () => {
+      const notes = await NoteService.searchNotes(search);
+      setSearchResultNotes(notes);
+    };
+    searchNotes();
+  }, [search]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -115,6 +164,8 @@ const CommandModal = () => {
           <Box borderBottomWidth="1px" mb={5}>
             <InputGroup>
               <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search note or type command..."
                 border="none"
                 width="full"
@@ -137,10 +188,16 @@ const CommandModal = () => {
             </InputGroup>
           </Box>
           <VStack px={3} align="start" spacing={2}>
-            <ModalSection title="Recent">
-              <CommandItem icon={FiFileText} name="Note 1" />
-              <CommandItem icon={FiFileText} name="Note 2" />
-              <CommandItem icon={FiFileText} name="Note 3" />
+            <ModalSection
+              title={search === "" ? "Recents" : "Results"}
+            >
+              {take(searchResultNotes, 5).map((note) => (
+                <NoteItem
+                  icon={FiFileText}
+                  name={note.title}
+                  tags={note.tags}
+                />
+              ))}
             </ModalSection>
             <ModalSection title="Actions">
               <CommandItem
