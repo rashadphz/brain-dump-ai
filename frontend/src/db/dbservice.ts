@@ -23,6 +23,27 @@ export interface NoteChangeObject {
 const db = new PouchDB("notes");
 
 const NoteService = {
+  getAllNotesMetadata: async (): Promise<Note[]> => {
+    return db
+      .allDocs<Note>({
+        include_docs: true,
+      })
+      .then((res) => {
+        const meta = res.rows.map((row) => {
+          const doc = row.doc as Note;
+          return {
+            _id: doc._id,
+            title: doc.title,
+            tags: doc.tags,
+            content: doc.content.slice(0, 300),
+            createdAt: doc.createdAt,
+            updatedAt: doc.updatedAt,
+          };
+        });
+        return sortBy(meta, "updatedAt").reverse() as Note[];
+      });
+  },
+
   getAllNotes: async (): Promise<Note[]> => {
     return db
       .allDocs<Note>({
@@ -57,6 +78,11 @@ const NoteService = {
     db.remove(doc);
   },
 
+  getNoteById: async (id: string): Promise<Note> => {
+    const doc = await db.get<Note>(id);
+    return doc;
+  },
+
   updateNoteById: async (id: string, note: Note): Promise<void> => {
     const doc = await db.get(id);
     await db.put({
@@ -67,7 +93,7 @@ const NoteService = {
   },
 
   searchNotes: async (query: string): Promise<Note[]> => {
-    if (!query) return await NoteService.getAllNotes();
+    if (!query) return await NoteService.getAllNotesMetadata();
 
     await db.createIndex({
       index: {

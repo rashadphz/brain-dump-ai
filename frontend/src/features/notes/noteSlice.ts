@@ -27,21 +27,25 @@ export const globalRawTextChange = createAsyncThunk<
   return rawText;
 });
 
-export const globalAllNotesFetch = createAsyncThunk<Note[], void>(
-  "note/globalAllNotesFetch",
-  async (arg, { getState, dispatch }) => {
-    const notes = await NoteService.getAllNotes();
-    return notes;
-  }
-);
+export const globalAllNotesMetadataFetch = createAsyncThunk<
+  Note[],
+  void
+>("note/globalAllNotesFetch", async (arg, { getState, dispatch }) => {
+  const notes = await NoteService.getAllNotesMetadata();
+  return notes;
+});
 
 export const globalNoteOpen = createAsyncThunk<
   Note | null,
-  Note | null
+  string | null
 >("note/globalNoteOpen", async (arg, { getState, dispatch }) => {
-  const note = arg;
-  const rawText = note?.content;
-  dispatch(handleRawTextChange(rawText || ""));
+  const noteId = arg;
+  if (noteId === null) {
+    dispatch(handleRawTextChange(""));
+    return null;
+  }
+  const note = await NoteService.getNoteById(noteId);
+  dispatch(handleRawTextChange(note.content));
   return note;
 });
 
@@ -50,7 +54,7 @@ export const globalNoteCreate = createAsyncThunk<Note, void>(
   async (arg, { getState, dispatch }) => {
     const note = await NoteService.createNote();
     const rawText = note.content;
-    dispatch(globalNoteOpen(note));
+    dispatch(globalNoteOpen(note._id!));
     return note;
   }
 );
@@ -142,9 +146,12 @@ export const noteSlice = createSlice({
       .addCase(globalNoteCreate.fulfilled, (state, action) => {
         NoteAdapter.addOne(state.all, action.payload);
       })
-      .addCase(globalAllNotesFetch.fulfilled, (state, action) => {
-        NoteAdapter.setAll(state.all, action.payload);
-      })
+      .addCase(
+        globalAllNotesMetadataFetch.fulfilled,
+        (state, action) => {
+          NoteAdapter.setAll(state.all, action.payload);
+        }
+      )
       .addCase(globalNoteDelete.fulfilled, (state, action) => {
         NoteAdapter.removeOne(state.all, action.payload._id!);
       })

@@ -22,7 +22,7 @@ import moment from "moment";
 import { useReduxSelector, useReduxDispatch } from "../redux/hooks";
 import { handleOpen } from "./CommandModal/commandModalSlice";
 import {
-  globalAllNotesFetch,
+  globalAllNotesMetadataFetch,
   globalNoteCreate,
   globalNoteDelete,
   globalNoteOpen,
@@ -111,7 +111,7 @@ const NotesSidebar = () => {
   const dispatch = useReduxDispatch();
 
   useEffect(() => {
-    const promise = dispatch(globalAllNotesFetch());
+    const promise = dispatch(globalAllNotesMetadataFetch());
     return () => {
       promise.abort();
     };
@@ -166,7 +166,9 @@ const NotesSidebar = () => {
           const isSelected = note._id === currentNote?._id;
           return (
             <Box
-              onClick={() => dispatch(globalNoteOpen({ ...note }))}
+              onClick={() =>
+                dispatch(globalNoteOpen(note._id || null))
+              }
             >
               <NotePreview isSelected={isSelected} note={note} />
             </Box>
