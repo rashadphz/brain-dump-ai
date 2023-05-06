@@ -9,8 +9,8 @@ export interface Note {
   title: string;
   content: string;
   tags: string[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type NoteChangeType = "CREATED" | "UPDATED" | "DELETED";
@@ -44,8 +44,8 @@ const NoteService = {
     const doc = {
       ...note,
       _id: new Date().toISOString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toUTCString(),
+      updatedAt: new Date().toUTCString(),
     };
 
     await db.put(doc);

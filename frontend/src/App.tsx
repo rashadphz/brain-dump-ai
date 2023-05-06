@@ -72,33 +72,6 @@ function App() {
     []
   );
 
-  //   useEffect(() => {
-  //     const changes = NoteService.subscribe(
-  //       ({ note, changeType: type }) => {
-  //         if (type == "CREATED") {
-  //           setNotes((notes) => [note!, ...notes]);
-  //           setSelectedNote(note!);
-  //         } else if (type == "UPDATED") {
-  //           setNotes((notes) =>
-  //             notes.map((n) => (n._id == note!._id ? note! : n))
-  //           );
-  //           setSelectedNote((prev) =>
-  //             prev?._id == note!._id ? note! : prev
-  //           );
-  //         } else if (type == "DELETED") {
-  //           NoteService.getAllNotes().then((notes) => {
-  //             setNotes(notes);
-  //             setSelectedNote(notes[0]);
-  //           });
-  //         }
-  //       }
-  //     );
-
-  //     return () => {
-  //       changes.cancel();
-  //     };
-  //   }, []);
-
   useEffect(() => {
     NoteService.getAllNotes().then((notes) => {
       setNotes(notes);

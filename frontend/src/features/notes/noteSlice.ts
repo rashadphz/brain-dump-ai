@@ -2,14 +2,13 @@ import {
   createAsyncThunk,
   createSlice,
   createEntityAdapter,
-  configureStore,
   EntityState,
   PayloadAction,
 } from "@reduxjs/toolkit";
 import NoteService, { Note } from "../../db/dbservice";
 import { handleRawTextChange } from "../markdownParser/markdownParserSlice";
-import { useDebounce } from "../../hooks/useDebounce";
 import { RootState } from "../../redux/store";
+import { debounce } from "lodash";
 
 export const globalRawTextChange = createAsyncThunk<
   string,
@@ -18,6 +17,13 @@ export const globalRawTextChange = createAsyncThunk<
   const { rawText } = arg;
   // @ts-ignore
   const selectedNote = getState().note.selectedNote;
+
+  const note = {
+    ...selectedNote,
+    content: rawText,
+  };
+
+  dispatch(globalNoteSave(note));
   return rawText;
 });
 
@@ -49,7 +55,7 @@ export const globalNoteCreate = createAsyncThunk<Note, void>(
   }
 );
 
-export const globalNoteSave = createAsyncThunk<void, Note>(
+export const globalNoteSave = createAsyncThunk<Note, Note>(
   "note/globalNoteSave",
   async (arg, { getState, dispatch }) => {
     const getNoteTitle = (mkdn: string): string => {
@@ -65,18 +71,23 @@ export const globalNoteSave = createAsyncThunk<void, Note>(
 
     const note = arg;
     const rawText = note.content;
-    const saveNote = () => {
-      if (!note._id) return;
-
-      NoteService.updateNoteById(note._id!, {
-        ...note,
-        title: getNoteTitle(rawText),
-        tags: getNoteTags(rawText),
-        content: rawText,
-      });
-
-      useDebounce(saveNote, 2000);
+    const finalNote = {
+      ...note,
+      title: getNoteTitle(rawText),
+      tags: getNoteTags(rawText),
+      content: rawText,
     };
+
+    const saveNote = debounce(() => {
+      NoteService.updateNoteById(note._id!, finalNote);
+      return finalNote;
+    }, 1000);
+
+    saveNote();
+
+    return new Promise<Note>((resolve) => {
+      resolve(finalNote);
+    });
   }
 );
 
@@ -136,6 +147,12 @@ export const noteSlice = createSlice({
       })
       .addCase(globalNoteDelete.fulfilled, (state, action) => {
         NoteAdapter.removeOne(state.all, action.payload._id!);
+      })
+      .addCase(globalNoteSave.fulfilled, (state, action) => {
+        NoteAdapter.updateOne(state.all, {
+          id: action.payload._id!,
+          changes: action.payload,
+        });
       });
   },
 });
