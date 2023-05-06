@@ -29,22 +29,21 @@ export const globalAllNotesFetch = createAsyncThunk<Note[], void>(
   }
 );
 
-export const globalNoteOpen = createAsyncThunk<Note, Note>(
-  "note/globalNoteOpen",
-  async (arg, { getState, dispatch }) => {
-    const note = arg;
-    const rawText = note.content;
-    dispatch(handleRawTextChange(rawText));
-    return note;
-  }
-);
+export const globalNoteOpen = createAsyncThunk<
+  Note | null,
+  Note | null
+>("note/globalNoteOpen", async (arg, { getState, dispatch }) => {
+  const note = arg;
+  const rawText = note?.content;
+  dispatch(handleRawTextChange(rawText || ""));
+  return note;
+});
 
 export const globalNoteCreate = createAsyncThunk<Note, void>(
   "note/globalNoteCreate",
   async (arg, { getState, dispatch }) => {
     const note = await NoteService.createNote();
     const rawText = note.content;
-    dispatch(handleRawTextChange(rawText));
     dispatch(globalNoteOpen(note));
     return note;
   }
@@ -78,6 +77,16 @@ export const globalNoteSave = createAsyncThunk<void, Note>(
 
       useDebounce(saveNote, 2000);
     };
+  }
+);
+
+export const globalNoteDelete = createAsyncThunk<Note, Note>(
+  "note/globalNoteDelete",
+  async (arg, { getState, dispatch }) => {
+    const note = arg;
+    await NoteService.deleteNoteById(note._id!);
+    dispatch(globalNoteOpen(null));
+    return note;
   }
 );
 
@@ -118,10 +127,15 @@ export const noteSlice = createSlice({
     builder
       .addCase(globalNoteOpen.fulfilled, (state, action) => {
         state.selectedNote = action.payload;
-        NoteAdapter.upsertOne(state.all, action.payload);
+      })
+      .addCase(globalNoteCreate.fulfilled, (state, action) => {
+        NoteAdapter.addOne(state.all, action.payload);
       })
       .addCase(globalAllNotesFetch.fulfilled, (state, action) => {
         NoteAdapter.setAll(state.all, action.payload);
+      })
+      .addCase(globalNoteDelete.fulfilled, (state, action) => {
+        NoteAdapter.removeOne(state.all, action.payload._id!);
       });
   },
 });

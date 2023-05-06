@@ -24,6 +24,7 @@ import { handleOpen } from "./CommandModal/commandModalSlice";
 import {
   globalAllNotesFetch,
   globalNoteCreate,
+  globalNoteDelete,
   globalNoteOpen,
   noteSelectors,
 } from "../features/notes/noteSlice";
@@ -41,6 +42,7 @@ const NotePreview = ({
   const deleteNote = () => {
     if (note._id) NoteService.deleteNoteById(note._id);
   };
+  const dispatch = useReduxDispatch();
 
   return (
     <ChakraProvider resetCSS>
@@ -63,7 +65,7 @@ const NotePreview = ({
                 aria-label="delete"
                 backgroundColor="transparent"
                 size="xs"
-                onClick={deleteNote}
+                onClick={() => dispatch(globalNoteDelete(note))}
               />
             )}
           </HStack>
