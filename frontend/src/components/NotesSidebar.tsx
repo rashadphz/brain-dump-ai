@@ -22,9 +22,12 @@ import moment from "moment";
 import { useReduxSelector, useReduxDispatch } from "../redux/hooks";
 import { handleOpen } from "./CommandModal/commandModalSlice";
 import {
+  globalAllNotesFetch,
   globalNoteCreate,
   globalNoteOpen,
+  noteSelectors,
 } from "../features/notes/noteSlice";
+import { useEffect } from "react";
 
 const NotePreview = ({
   note,
@@ -97,11 +100,20 @@ const NotePreview = ({
   );
 };
 
-const NotesSidebar = ({ notes }: { notes: Note[] }) => {
+const NotesSidebar = () => {
+  const notes = useReduxSelector(noteSelectors.selectAll);
+
   const currentNote = useReduxSelector(
     (state) => state.note.selectedNote
   );
   const dispatch = useReduxDispatch();
+
+  useEffect(() => {
+    const promise = dispatch(globalAllNotesFetch());
+    return () => {
+      promise.abort();
+    };
+  }, [dispatch]);
 
   return (
     <Box mx="auto" alignItems="flex-start" width="100%">

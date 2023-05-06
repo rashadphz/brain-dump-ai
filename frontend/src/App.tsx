@@ -147,7 +147,7 @@ function App() {
           background="gray.900"
           height="100vh"
         >
-          <NotesSidebar notes={notes} />
+          <NotesSidebar />
         </Box>
         <Box w="70%" px={2} marginRight="1rem">
           <Tabs isLazy>

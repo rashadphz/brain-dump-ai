@@ -61,7 +61,7 @@ const myTheme = githubDarkInit({
 import "../bearstyle.css";
 import { Box } from "@chakra-ui/react";
 import { useReduxDispatch, useReduxSelector } from "../redux/hooks";
-import { handleRawTextChange } from "../features/markdownParser/markdownParserSlice";
+import { globalRawTextChange } from "../features/notes/noteSlice";
 
 const Editor = () => {
   const rawText = useReduxSelector(
@@ -74,7 +74,11 @@ const Editor = () => {
       <CodeMirror
         value={rawText}
         onChange={(value) => {
-          dispatch(handleRawTextChange(value));
+          dispatch(
+            globalRawTextChange({
+              rawText: value,
+            })
+          );
         }}
         theme={myTheme}
         basicSetup={{
