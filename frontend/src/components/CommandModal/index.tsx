@@ -72,16 +72,17 @@ type NoteItemProps = {
   name: string;
   icon: React.ElementType;
   tags: string[];
-  props?: any;
+  focused: boolean;
 };
 
-const NoteItem = ({ name, icon, tags }: NoteItemProps) => {
+const NoteItem = ({ name, icon, tags, focused }: NoteItemProps) => {
   return (
     <ListItem
       cursor="pointer"
       display="flex"
       alignItems="center"
       _hover={{ backgroundColor: "gray.700" }}
+      backgroundColor={focused ? "gray.700" : "transparent"}
       py={1}
       px={2}
       borderRadius="md"
@@ -127,6 +128,7 @@ const CommandModal = () => {
   const [searchResultNotes, setSearchResultNotes] = useState<Note[]>(
     []
   );
+  const [focusedItem, setFocusedItem] = useState<number>(-1);
 
   useEffect(() => {
     const searchNotes = async () => {
@@ -149,6 +151,35 @@ const CommandModal = () => {
     };
   }, [isOpen]);
 
+  const handleSelectItem = (itemIndex: number) => {
+    const note = searchResultNotes[itemIndex];
+    const noteId = note._id;
+    dispatch(handleClose());
+    dispatch(globalNoteOpen(noteId || null));
+    setSearch("");
+  };
+
+  const handleInputKeydown = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    switch (event.key) {
+      case "ArrowDown": {
+        event.preventDefault();
+        setFocusedItem((old) => old + 1);
+        break;
+      }
+      case "ArrowUp": {
+        event.preventDefault();
+        setFocusedItem((old) => old - 1);
+        break;
+      }
+      case "Enter": {
+        event.preventDefault();
+        handleSelectItem(focusedItem);
+      }
+    }
+  };
+
   return (
     <Modal
       size="2xl"
@@ -167,7 +198,10 @@ const CommandModal = () => {
             <InputGroup>
               <Input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setFocusedItem(-1);
+                }}
                 placeholder="Search note or type command..."
                 border="none"
                 width="full"
@@ -177,6 +211,7 @@ const CommandModal = () => {
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck="false"
+                onKeyDown={handleInputKeydown}
               />
               <InputLeftElement pointerEvents="none">
                 <Icon as={AiOutlineSearch} color="gray.300" />
@@ -193,19 +228,18 @@ const CommandModal = () => {
             <ModalSection
               title={search === "" ? "Recents" : "Results"}
             >
-              {take(searchResultNotes, 5).map((note) => (
+              {take(searchResultNotes, 5).map((note, idx) => (
                 <Box
                   key={note._id}
                   onClick={() => {
-                    dispatch(handleClose());
-                    dispatch(globalNoteOpen(note._id || null));
-                    setSearch("");
+                    handleSelectItem(idx);
                   }}
                 >
                   <NoteItem
                     icon={FiFileText}
                     name={note.title}
                     tags={note.tags}
+                    focused={focusedItem == idx}
                   />
                 </Box>
               ))}
