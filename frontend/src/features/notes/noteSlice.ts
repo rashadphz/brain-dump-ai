@@ -45,6 +45,7 @@ export const globalNoteCreate = createAsyncThunk<Note, void>(
     const note = await NoteService.createNote();
     const rawText = note.content;
     dispatch(handleRawTextChange(rawText));
+    dispatch(globalNoteOpen(note));
     return note;
   }
 );
@@ -117,6 +118,7 @@ export const noteSlice = createSlice({
     builder
       .addCase(globalNoteOpen.fulfilled, (state, action) => {
         state.selectedNote = action.payload;
+        NoteAdapter.upsertOne(state.all, action.payload);
       })
       .addCase(globalNoteCreate.fulfilled, (state, action) => {
         state.selectedNote = action.payload;
