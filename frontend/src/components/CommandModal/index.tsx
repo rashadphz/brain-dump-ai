@@ -33,6 +33,7 @@ import { FiFilePlus, FiFileText } from "react-icons/fi";
 import NoteService, { Note } from "../../db/dbservice";
 import { take } from "lodash";
 import TagBadge from "../TagBadge";
+import { globalNoteOpen } from "../../features/notes/noteSlice";
 
 type CommandItemProps = {
   name: string;
@@ -71,6 +72,7 @@ type NoteItemProps = {
   name: string;
   icon: React.ElementType;
   tags: string[];
+  props?: any;
 };
 
 const NoteItem = ({ name, icon, tags }: NoteItemProps) => {
@@ -192,11 +194,20 @@ const CommandModal = () => {
               title={search === "" ? "Recents" : "Results"}
             >
               {take(searchResultNotes, 5).map((note) => (
-                <NoteItem
-                  icon={FiFileText}
-                  name={note.title}
-                  tags={note.tags}
-                />
+                <Box
+                  key={note._id}
+                  onClick={() => {
+                    dispatch(handleClose());
+                    dispatch(globalNoteOpen(note._id || null));
+                    setSearch("");
+                  }}
+                >
+                  <NoteItem
+                    icon={FiFileText}
+                    name={note.title}
+                    tags={note.tags}
+                  />
+                </Box>
               ))}
             </ModalSection>
             <ModalSection title="Actions">
