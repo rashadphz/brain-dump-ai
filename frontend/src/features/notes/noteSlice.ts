@@ -120,9 +120,6 @@ export const noteSlice = createSlice({
         state.selectedNote = action.payload;
         NoteAdapter.upsertOne(state.all, action.payload);
       })
-      .addCase(globalNoteCreate.fulfilled, (state, action) => {
-        state.selectedNote = action.payload;
-      })
       .addCase(globalAllNotesFetch.fulfilled, (state, action) => {
         NoteAdapter.setAll(state.all, action.payload);
       });
