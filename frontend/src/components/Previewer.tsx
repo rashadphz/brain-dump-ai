@@ -52,7 +52,7 @@ for (const [header, fontSize] of headerMap) {
   );
 }
 
-const baseTheme: typeof defaults = {
+export const baseTheme: typeof defaults = {
   ...baseHeaders,
   h1: (props) => (
     <Heading

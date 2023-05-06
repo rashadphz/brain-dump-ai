@@ -34,6 +34,7 @@ import NoteService, { Note } from "../../db/dbservice";
 import { take } from "lodash";
 import TagBadge from "../TagBadge";
 import { globalNoteOpen } from "../../features/notes/noteSlice";
+import NotePreviewModal from "./NotePreviewModal";
 
 type CommandItemProps = {
   name: string;
@@ -129,6 +130,7 @@ const CommandModal = () => {
     []
   );
   const [focusedItem, setFocusedItem] = useState<number>(-1);
+  const [focusedNote, setFocusedNote] = useState<Note | null>(null);
 
   useEffect(() => {
     const searchNotes = async () => {
@@ -137,6 +139,15 @@ const CommandModal = () => {
     };
     searchNotes();
   }, [search]);
+
+  useEffect(() => {
+    if (focusedItem >= 0 && focusedItem < searchResultNotes.length) {
+      const note = searchResultNotes[focusedItem];
+      setFocusedNote(note);
+    } else {
+      setFocusedNote(null);
+    }
+  }, [focusedItem]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -185,15 +196,28 @@ const CommandModal = () => {
       size="2xl"
       isOpen={isOpen}
       onClose={() => dispatch(handleClose())}
-      isCentered
     >
       <ModalOverlay backdropFilter="blur(2px)" />
       <ModalContent
-        backgroundColor="gray.900"
+        backgroundColor="transparent"
         color="white"
         borderRadius="2xl"
       >
-        <ModalBody px={1}>
+        <Box backgroundColor="transparent" height="200">
+          {focusedNote ? (
+            <ModalHeader
+              rounded="xl"
+              backgroundColor="gray.900"
+              width="90%"
+              mx="auto"
+            >
+              <NotePreviewModal content={focusedNote.content} />
+            </ModalHeader>
+          ) : (
+            <></>
+          )}
+        </Box>
+        <ModalBody mt={20} rounded="xl" bgColor="gray.900" px={1}>
           <Box borderBottomWidth="1px" mb={5}>
             <InputGroup>
               <Input
