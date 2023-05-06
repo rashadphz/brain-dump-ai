@@ -197,7 +197,7 @@ const CommandModal = () => {
       isOpen={isOpen}
       onClose={() => dispatch(handleClose())}
     >
-      <ModalOverlay backdropFilter="blur(2px)" />
+      <ModalOverlay backdropFilter="blur(3px)" />
       <ModalContent
         backgroundColor="transparent"
         color="white"
