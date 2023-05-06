@@ -89,40 +89,6 @@ const NoteService = {
 
     return docs as unknown as Note[];
   },
-
-  subscribe: (
-    onChange: (noteChangeObj: NoteChangeObject) => void
-  ) => {
-    const changes = db.changes<Note>({
-      since: "now",
-      live: true,
-      include_docs: true,
-    });
-    changes.on("change", async (change) => {
-      if (!change.doc) return;
-
-      if (change.doc._deleted) {
-        onChange({
-          changeType: "DELETED",
-          note: null,
-        });
-      } else {
-        if (change.doc._rev.startsWith("1-")) {
-          onChange({
-            changeType: "CREATED",
-            note: change.doc,
-          });
-        } else {
-          onChange({
-            changeType: "UPDATED",
-            note: change.doc,
-          });
-        }
-      }
-    });
-
-    return changes;
-  },
 };
 
 export default NoteService;
