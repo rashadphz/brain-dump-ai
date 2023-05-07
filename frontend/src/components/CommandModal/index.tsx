@@ -258,6 +258,7 @@ const CommandModal = () => {
                   onClick={() => {
                     handleSelectItem(idx);
                   }}
+                  onMouseOver={() => setFocusedItem(idx)}
                 >
                   <NoteItem
                     icon={FiFileText}
