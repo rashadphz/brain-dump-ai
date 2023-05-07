@@ -48,7 +48,7 @@ function App() {
 
   return (
     <Box
-      bg="gray.900"
+      bg="#1E2021"
       fontSize="md"
       height="100%"
       textAlign="left"
@@ -62,7 +62,7 @@ function App() {
           w="30%"
           borderRight="1px solid"
           borderColor="gray.700"
-          background="gray.900"
+          background="#1E2021"
           height="100vh"
         >
           <NotesSidebar />

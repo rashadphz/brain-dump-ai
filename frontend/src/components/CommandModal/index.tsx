@@ -210,7 +210,7 @@ const CommandModal = () => {
           {focusedNote ? (
             <ModalHeader
               rounded="xl"
-              backgroundColor="gray.900"
+              backgroundColor="#1E2021"
               width="90%"
               mx="auto"
             >
@@ -220,7 +220,7 @@ const CommandModal = () => {
             <></>
           )}
         </Box>
-        <ModalBody mt={20} rounded="xl" bgColor="gray.900" px={1}>
+        <ModalBody mt={20} rounded="xl" bgColor="#1E2021" px={1}>
           <Box borderBottomWidth="1px" mb={5}>
             <InputGroup>
               <Input

@@ -50,7 +50,7 @@ import { tags as t } from "@lezer/highlight";
 
 const myTheme = githubDarkInit({
   settings: {
-    background: "transparent",
+    background: "#1E2021",
   },
   styles: [
     { tag: [t.heading], color: "#89BEFA", fontWeight: "bold" },

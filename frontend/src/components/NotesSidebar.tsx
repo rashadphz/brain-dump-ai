@@ -54,7 +54,7 @@ const NotePreview = ({
         borderBottomWidth="1px"
         px={4}
         py={3}
-        backgroundColor={isSelected ? "blue.900" : "gray.900"}
+        backgroundColor={isSelected ? "blue.900" : "#1E2021"}
       >
         <VStack spacing={2} align="start">
           <HStack justifyContent={"space-between"} width="100%">
