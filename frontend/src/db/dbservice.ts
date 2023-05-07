@@ -29,18 +29,8 @@ const NoteService = {
         include_docs: true,
       })
       .then((res) => {
-        const meta = res.rows.map((row) => {
-          const doc = row.doc as Note;
-          return {
-            _id: doc._id,
-            title: doc.title,
-            tags: doc.tags,
-            content: doc.content.slice(0, 300),
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt,
-          };
-        });
-        return sortBy(meta, "updatedAt").reverse() as Note[];
+        const docs = res.rows.map((row) => row.doc);
+        return sortBy(docs, "updatedAt").reverse() as Note[];
       });
   },
 
