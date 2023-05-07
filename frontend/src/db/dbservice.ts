@@ -2,6 +2,8 @@ import PouchDB from "pouchdb";
 import PouchDBFind from "pouchdb-find";
 import { sortBy } from "lodash";
 
+import { v4 as uuidv4 } from "uuid";
+
 PouchDB.plugin(PouchDBFind);
 
 export interface Note {
@@ -54,7 +56,7 @@ const NoteService = {
 
     const doc = {
       ...note,
-      _id: new Date().toISOString(),
+      _id: uuidv4(),
       createdAt: new Date().toUTCString(),
       updatedAt: new Date().toUTCString(),
     };
