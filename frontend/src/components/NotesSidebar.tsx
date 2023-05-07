@@ -13,6 +13,8 @@ import {
   Button,
   Flex,
   Kbd,
+  List,
+  ListItem,
 } from "@chakra-ui/react";
 import NoteService, { Note } from "../db/dbservice";
 import { HiOutlinePencilAlt, HiOutlineSearch } from "react-icons/hi";
@@ -75,8 +77,9 @@ const NotePreview = ({
                 {moment(note.createdAt).fromNow()}
               </Text>
               {tags &&
-                tags.map((tag) => (
+                tags.map((tag, idx) => (
                   <Badge
+                    key={idx}
                     borderRadius="full"
                     px="2"
                     colorScheme="blue"
@@ -152,29 +155,28 @@ const NotesSidebar = () => {
           onClick={() => dispatch(globalNoteCreate())}
         />
       </HStack>
-      <Stack
+      <List
         maxH="100vh"
         overflowY="auto"
         overflowX="hidden"
-        direction="column"
         spacing={0}
-        align="start"
         display="block"
         pb={200}
       >
-        {notes.map((note) => {
+        {notes.map((note, idx) => {
           const isSelected = note._id === currentNote?._id;
           return (
-            <Box
+            <ListItem
               onClick={() =>
                 dispatch(globalNoteOpen(note._id || null))
               }
+              key={idx}
             >
               <NotePreview isSelected={isSelected} note={note} />
-            </Box>
+            </ListItem>
           );
         })}
-      </Stack>
+      </List>
     </Box>
   );
 };
