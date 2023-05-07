@@ -132,6 +132,8 @@ const CommandModal = () => {
   const [focusedItem, setFocusedItem] = useState<number>(-1);
   const [focusedNote, setFocusedNote] = useState<Note | null>(null);
 
+  const inputFocusRef = React.useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const searchNotes = async () => {
       const notes = await NoteService.searchNotes(search);
@@ -196,6 +198,7 @@ const CommandModal = () => {
       size="2xl"
       isOpen={isOpen}
       onClose={() => dispatch(handleClose())}
+      initialFocusRef={inputFocusRef}
     >
       <ModalOverlay backdropFilter="blur(3px)" />
       <ModalContent
@@ -226,6 +229,7 @@ const CommandModal = () => {
                   setSearch(e.target.value);
                   setFocusedItem(-1);
                 }}
+                ref={inputFocusRef}
                 placeholder="Search note or type command..."
                 border="none"
                 width="full"
