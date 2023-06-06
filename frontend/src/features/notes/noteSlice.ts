@@ -9,6 +9,7 @@ import NoteService, { Note } from "../../db/dbservice";
 import { handleRawTextChange } from "../markdownParser/markdownParserSlice";
 import { RootState } from "../../redux/store";
 import { debounce } from "lodash";
+import { UploadService } from "../../client";
 
 export const globalRawTextChange = createAsyncThunk<
   string,
@@ -45,6 +46,12 @@ export const globalNoteOpen = createAsyncThunk<
     return null;
   }
   const note = await NoteService.getNoteById(noteId);
+//   const ok = await UploadService.uploadNote({
+//     note_id: note._id!,
+//     title: note.title,
+//     markdown: note.content,
+//   });
+//   console.log(ok)
   dispatch(handleRawTextChange(note.content));
   return note;
 });

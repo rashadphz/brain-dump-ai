@@ -21,6 +21,8 @@ import {
   List,
   ListItem,
   ListIcon,
+  Skeleton,
+  Stack,
 } from "@chakra-ui/react";
 import {
   useReduxDispatch,
@@ -31,10 +33,11 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineSearch, AiOutlineFileText } from "react-icons/ai";
 import { FiFilePlus, FiFileText } from "react-icons/fi";
 import NoteService, { Note } from "../../db/dbservice";
-import { take } from "lodash";
+import { debounce, take } from "lodash";
 import TagBadge from "../TagBadge";
 import { globalNoteOpen } from "../../features/notes/noteSlice";
 import NotePreviewModal from "./NotePreviewModal";
+import { HiSparkles } from "react-icons/hi";
 
 type CommandItemProps = {
   name: string;
@@ -106,14 +109,22 @@ const NoteItem = ({ name, icon, tags, focused }: NoteItemProps) => {
 
 export type ModalSectionProps = {
   title: string;
+  titleIcon?: React.ReactNode;
   children: React.ReactNode;
 };
-const ModalSection = ({ title, children }: ModalSectionProps) => {
+const ModalSection = ({
+  title,
+  titleIcon,
+  children,
+}: ModalSectionProps) => {
   return (
     <>
-      <Text fontWeight="bold" color="gray.500" fontSize="sm">
-        {title}
-      </Text>
+      <HStack spacing={1}>
+        <Text fontWeight="bold" color="gray.500" fontSize="sm">
+          {title}
+        </Text>
+        {titleIcon}
+      </HStack>
       <List width="full">{children}</List>
     </>
   );
@@ -129,10 +140,26 @@ const CommandModal = () => {
   const [searchResultNotes, setSearchResultNotes] = useState<Note[]>(
     []
   );
+  const [smartSearchResults, setSmartSearchResults] = useState<
+    Note[]
+  >([]);
   const [focusedItem, setFocusedItem] = useState<number>(-1);
   const [focusedNote, setFocusedNote] = useState<Note | null>(null);
+  const [isSmartSearching, setIsSmartSearching] = useState(false);
 
   const inputFocusRef = React.useRef<HTMLInputElement>(null);
+
+  const smartSearchNotes = async (query: string) => {
+    const notes = await NoteService.smartSearchNotes(query);
+    setSmartSearchResults(notes);
+
+    setIsSmartSearching(false);
+  };
+
+  const debouncedSmartSearchNotes = React.useCallback(
+    debounce(smartSearchNotes, 800),
+    []
+  );
 
   useEffect(() => {
     const searchNotes = async () => {
@@ -140,6 +167,11 @@ const CommandModal = () => {
       setSearchResultNotes(notes);
     };
     searchNotes();
+
+    if (searchResultNotes.length === 0) {
+      setIsSmartSearching(true);
+      debouncedSmartSearchNotes(search);
+    }
   }, [search]);
 
   useEffect(() => {
@@ -253,37 +285,79 @@ const CommandModal = () => {
             </InputGroup>
           </Box>
           <VStack px={3} align="start" spacing={2}>
-            <ModalSection
-              title={search === "" ? "Recents" : "Results"}
-            >
-              {take(searchResultNotes, 5).map((note, idx) => (
-                <Box
-                  key={note._id}
-                  onClick={() => {
-                    handleSelectItem(idx);
-                  }}
-                  onMouseOver={() => setFocusedItem(idx)}
+            {searchResultNotes.length == 0 && (
+              <ModalSection
+                title="Smart Results"
+                titleIcon={<Icon as={HiSparkles} color="blue.300" />}
+              >
+                {isSmartSearching ? (
+                  <Stack>
+                    <Skeleton
+                      height="25px"
+                      width="full"
+                      rounded="md"
+                    />
+                    <Skeleton
+                      height="25px"
+                      width="full"
+                      rounded="md"
+                    />
+                  </Stack>
+                ) : (
+                  take(smartSearchResults, 2).map((note, idx) => (
+                    <Box
+                      key={note._id}
+                      onClick={() => {
+                        handleSelectItem(idx);
+                      }}
+                      onMouseOver={() => setFocusedItem(idx)}
+                    >
+                      <NoteItem
+                        icon={FiFileText}
+                        name={note.title}
+                        tags={note.tags}
+                        focused={focusedItem == idx}
+                      />
+                    </Box>
+                  ))
+                )}
+              </ModalSection>
+            )}
+            {(search == "" || searchResultNotes.length > 0) && (
+              <>
+                <ModalSection
+                  title={search === "" ? "Recents" : "Results"}
                 >
-                  <NoteItem
-                    icon={FiFileText}
-                    name={note.title}
-                    tags={note.tags}
-                    focused={focusedItem == idx}
+                  {take(searchResultNotes, 5).map((note, idx) => (
+                    <Box
+                      key={note._id}
+                      onClick={() => {
+                        handleSelectItem(idx);
+                      }}
+                      onMouseOver={() => setFocusedItem(idx)}
+                    >
+                      <NoteItem
+                        icon={FiFileText}
+                        name={note.title}
+                        tags={note.tags}
+                        focused={focusedItem == idx}
+                      />
+                    </Box>
+                  ))}
+                </ModalSection>
+                <ModalSection title="Actions">
+                  <CommandItem
+                    icon={FiFilePlus}
+                    name="Create New Note..."
+                    rightElement={
+                      <Text fontSize="md" color="gray.500">
+                        <Kbd>⌘</Kbd> + <Kbd>N</Kbd>
+                      </Text>
+                    }
                   />
-                </Box>
-              ))}
-            </ModalSection>
-            <ModalSection title="Actions">
-              <CommandItem
-                icon={FiFilePlus}
-                name="Create New Note..."
-                rightElement={
-                  <Text fontSize="md" color="gray.500">
-                    <Kbd>⌘</Kbd> + <Kbd>N</Kbd>
-                  </Text>
-                }
-              />
-            </ModalSection>
+                </ModalSection>
+              </>
+            )}
           </VStack>
         </ModalBody>
         <ModalFooter px={1} py={0}>

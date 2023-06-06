@@ -3,6 +3,7 @@ import PouchDBFind from "pouchdb-find";
 import { sortBy } from "lodash";
 
 import { v4 as uuidv4 } from "uuid";
+import { SmartSearchService } from "../client";
 
 PouchDB.plugin(PouchDBFind);
 
@@ -106,6 +107,20 @@ const NoteService = {
     });
 
     return docs as unknown as Note[];
+  },
+
+  smartSearchNotes: async (query: string): Promise<Note[]> => {
+    if (!query) return [];
+
+    const noteIds = await SmartSearchService.smartSearch(query);
+
+    const notes = await Promise.all(
+      noteIds.map(async (id) => {
+        return await NoteService.getNoteById(id);
+      })
+    );
+    console.log(notes)
+    return notes;
   },
 };
 
